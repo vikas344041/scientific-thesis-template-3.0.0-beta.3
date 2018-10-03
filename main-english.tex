@@ -84,9 +84,9 @@ Characteristics of Permissioned Blockchain Networks},
 \else
   \section*{Abstract}
 \fi
-Blockchain is a ditributed ledger technology that consists of peers holding the same copy of data and it eliminates the need for a third party in exchanging assets and performing business transactions. In permissionless blockchain, any entity can participate in submitting and validationg a transaction as the entire blockchain network is public. Example of permissionless blockchain includes Ethereum and Bitcoin network. On the other hand, permissioned blockchains only allow certain entitites that have the right permission to be included in the blockchain network and to participate in the transactions proposal, execution and validation stages. Hyperledger Fabric is one such example involving a completely modular approach. It provides privacy and confidentiality in the blockchain network by using the concept of channels and it uses chaincode for transaction execution. \linebreak \linebreak
+Blockchain is a ditributed ledger technology that consists of peers holding the same copy of data and it eliminates the need for a third party in exchanging assets and performing business transactions. In permissionless blockchain, any entity can participate in submitting and validationg a transaction as the entire blockchain network is public. Example of permissionless blockchain includes Ethereum and Bitcoin network. On the other hand, permissioned blockchains only allow certain entitites that have the right permission to be included in the blockchain network and to participate in the transactions proposal, execution and validation stages. Hyperledger Fabric is one such example of a permissioned blockchain involving a completely modular approach. It provides privacy and confidentiality in the blockchain network by using the concept of channels and it uses chaincode for transaction execution. \linebreak \linebreak
 The main aim of this thesis is to investigate the transactional properties of permissioned blockchain networks like
-Hyperledger Fabric and evaluate them by comparing them to the ACID properties of RDBMS. A supply chain application has been developed that demonstrates the various business transactions like getting product details, creating a new product and updating a product. Hyperledger Fabric performs business transactions with the help of chaincodes that are deployed on peers and channels are introduced to provide privacy. A web frontend has been created that serves as a 2-P transaction monitor for writing data to different channels. Also an android application is created that gets all the products, creates products and updates existing products in the supply chain. Rollback, savepoint and nested transactions are important part of any business transactions and hence, an equivalent system that implements these properties with blockchain is developed. Also the immutability of blockchain involving number of peers is studied and it is found that the blockchain itself is immutable but the state database on a single peer can be modified in absence of efficient endorsement policy. 
+Hyperledger Fabric and evaluate them by comparing them to the ACID properties of RDBMS. A supply chain application has been developed that demonstrates the various business transactions like getting product details, creating a new product and updating a product. Hyperledger Fabric performs business transactions with the help of chaincodes that are deployed on peers and channels are introduced to provide privacy. A web frontend has been created that serves as a 2-P transaction monitor for writing data to different channels. Also an android application is created that gets all the products, creates products and updates existing products in the supply chain. Rollback, savepoint and nested transactions are important part of any business transactions and hence, an equivalent system that implements these concepts with blockchain is developed. Also the immutability of blockchain involving number of peers is studied and it is found that the blockchain itself is immutable but the state database on a single peer can be modified in absence of efficient endorsement policy. 
 
 \cleardoublepage
 
@@ -208,25 +208,78 @@ Hyperledger Fabric and evaluate them by comparing them to the ACID properties of
 
 \chapter{Introduction}
 
-ACID defines the transaction properties in Relational Database Management Systems that help to achieve reliability in business transactions. The main focus is on achieving database consistency. The significance of the ACID properties is described as follows :
+ACID defines the transaction properties in \glspl{rdbms} that help to achieve reliability in business transactions. The main focus is on achieving database consistency. The significance of the ACID properties is described as follows :
 \begin{enumerate}
-  \item Atomicity : The transaction is considered as an atomic unit of work and a transaction can either be committed successfully in the database or it can be aborted due to a failure but it can never be partially committed. There are two main operations \textbf{Abort} and \textbf{Commit}. It is also called as \verb|`All or nothing`| property \cite{RVvdA2016}.
-  \item The numbers starts at 1 with every call to the enumerate environment.
+  \item Atomicity: The transaction is considered as an atomic unit of work and a transaction can either be committed successfully in the database or it can be aborted due to a failure but it can never be partially committed. There are two main operations \textbf{Abort} and \textbf{Commit}. It is also called as \verb|`All or nothing`| property \cite{Atomicity}.
+  \item Consistency: The total value of asset in a database before a transaction and its value after the transaction(committed or aborted) is always the same. In other words, it maintains consistency by adhering to the database constraints. Inconsistent databases can lead to catastrophic events that cannot be rolled back in most cases.
+  \item Isolation: Isolation ensures that multiple transactions can take place parallely without resulting in an inconsistent state in the database. This is equivalent to the transaction result execution in sequential manner with the advantages of concurrency control. Isolation guarantees that the changes made by a transaction are only visible only after its written to the main memory.
+  \item Durability: It is expected that the database remain robust in case of hardware failures and the data generated in the process of transaction execution does not get lost due to this catastrophic failure. Durability ensures that the data remains persistent in case of transaction commitment and never gets lost due to system failure. Physical storages like Hard disk are used to guarantee durability of transactions.
 \end{enumerate}
 
-\chapter{Chapter Two}
-\label{chap:k2}
+The ACID properties in \glspl{rdbms} provides a way to maintain consistency, data persistence, robustness, parallel transaction execution and avoid double spending. Typically, it is the responsibility of the \textit{transaction manager} component of a Transaction Processing system that involves co-ordination with different \textit{resource managers} \cite{Salt}. 
+
+Blockchain has evolved as a peer to peer system that eliminates the need to have a trusted third party that manages the business transactions. It consists of immutable ledgers that are the only source of truth in the system and which cannot be modified by a single entity and every peer maintains a copy of the ledger. It is due to these important properties that blockchains have found applications in various industries like Supply Chain Management, Financial organizations and any network involving many participants that do not fully trust each other \cite{BC}. As blockchains have found way into the business use cases, it becomes extremely essential to study the transaction properties of blockchains. A typical business transaction involves many sub-transactions that are related to each other. It becomes important to study the behaviour of a blockchain system as monetary values are involved in the business transactions and the transactions are spanned across different entities in the network and are sometimes inter-linked with each other. It is important to study the behaviour of blockchain systems by comparing it to the ACID properties of the traditional \glspl{rdbms}. A blockchain system is generally classified into two different types of networks based on the ability of having controlled or uncontrolled admission in the blockchain network: \textbf{Permissionless Blockchains} and \textbf{Permissioned Blockchains}. 
+
+\textbf{Permissionless Blockchain}: In a permissionless blockchain network, anyone can join the channel and act as miner/validator and anyone can submit a transaction as there is no central authority that authorizes who can join the network \cite{PLB}. Miners are given incentives to remain in the network and provide resources for calculating the hash and that results in a new block creation. Typically, the transactions are visible to the public but the identity of the node submitting a transaction is not known. The blockchain network is mostly driven by a cryptocurrency that is used for submitting a transaction. Examples of such network include \textit{Ethereum} and \textit{Bitcoin}.
+
+\textbf{Permissioned Blockchain}: A permissioned blockchain network has a central authority that governs the rules about who can join the channel and submit the transactions. Most of the permissioned blockchain networks are built around the B2B use cases and hence, involves proper management about the right entities joining the channel. \textit{Hyperledger Fabric} is one such example of a permissioned blockchain network that follows a modular architectural style and can be adapted according to the needs of the business organizations \cite{HF}. It has an important concept of channels that provides privacy and confidentiality to a subset of participants in the network. 
+
+Both the permissioned and permissionless blockchain networks have their application in the B2B scenario and therefore, it becomes imperative to compare and evaluate them with the existing traditional \glspl{rdbms} and verify if the ACID properties are as strong as in the \glspl{rdbms}. This will provide us with an overview if the Blockchain technology can still be used efficiently in the B2B scenarios and the steps towards making it robust, secure and immutable.
+
+\section{Problem Statement}
+In the past, studies have been conducted to evaluate the transaction processing characteristics of permissionless blockchain
+networks, which use consensus algorithms like Proof-of-Work or Proof-of-Stake for transaction processing, and it is found that they follow different semantics as compared to the \glspl{rdbms} \cite{Salt}. From the transactions perspective, permissionless blockchain networks are generally classified as \textit{Sequential}, \textit{Agreed}, \textit{Ledgered} and \textit{Tamper-resistant} \cite{Salt}. On the other hand, these permissionless blockchain networks are characterized as \textit{Symmetric}, \textit{Admin-free}, \textit{Ledgered} and \textit{Time-consensual} \cite{Salt}. Moreover, only little research has been done on the transaction processing properties of permissioned blockchain networks that incorporate the same underlying concept of \glspl{dlt} as the permissionless blockchains, but differ substantially in the transaction processing
+and execution. The primary aim of this thesis is to put forward the important aspects of \textit{Permissioned Blockchains}, to identify and evaluate the various transaction processing characteristics of such a network and to implement a supply chain application that demonstrates the various business transactions. The permissioned blockchain framework that is studied in this thesis is based on Hyperledger Fabric.
+
+\section{Scope of Work}
+This thesis is divided into two main parts. In the first part we discuss the various concepts in Permissioned Blockchains like \textit{\glspl{msp}}, \textit{consensus algorithms}, \textit{chaincodes}, \textit{ledger}, \textit{endorsement policy}, \textit{peers} and \textit{channels}. We will dive into the details of all these components that are part of the Hyperledger Fabric framework. We will study the transaction processing characteristics of Hyperledger Fabric in relation to these intrinsic components. In the second part, we will create a supply chain application that includes the basic business transactions like querying a product, getting all the product details, creating a new product and updating the current owner of a product. We will also evaluate the business transaction spanning multiple channels and how they are managed in permissioned blockchain in case of failure. Here, we will study about commit, rollback, save-point and nested transactions. We will also study the immutability property of the distributed ledger in Hyperledger Fabric and understand its impact on the business transactions. For the implementation, we will create an Angular web application and an Android application. The key technologies utilized for this use case are \gls{css}, \gls{html}, chaincodes written in Go language, Android SDK and JavaScript.
+
+\section{Outline}
+The remaining content of the document is arranged as follows:
+
+\textbf{\cref{chap:fund} - \nameref{chap:fund}} : In this chapter we will discuss the fundamentals of permissioned blockchains based on Hyperledger Fabric, difference between permissioned and permissionless blockchains on the basis of transaction processing characteristics and the types and classification of consensus algorithms and how they impact the transaction flow.
+
+\textbf{\cref{chap:rel} - \nameref{chap:rel}} : This chapter will give an overview of the different work being carried on permissioned blockchains that impact its transaction properties.
+
+\textbf{\cref{chap:tc} - \nameref{chap:tc}} : This chapter will highlight the differences in the transaction processing characteristics of permissioned blockchains by comparing it with the properties of \glspl{rdbms}.
+
+\textbf{\cref{chap:cs} - \nameref{chap:cs}} : In this chapter we will discuss the detailed functional and non-functional requirements and the system to be developed.
+
+\textbf{\cref{chap:de} - \nameref{chap:de}} : In this chapter we will define the Data model for the application and discuss the architecture of transaction flow.
+
+\textbf{\cref{chap:iv} - \nameref{chap:iv}} : The actual development steps of the supply chain application will be discussed here in detail with the chaincode execution, web front-end development, channels creation and a 2-P transaction monitor.
+
+\textbf{\cref{chap:cf} - \nameref{chap:cf}} : This chapter will summarize the entire thesis work and will give us some future research possibilities.
 
 
+\chapter{Fundamentals}
+\label{chap:fund}
 
-\blinddocument
 
-\chapter{vikas}
+\chapter{Related Work}
+\label{chap:rel}
 
-\chapter{Conclusion and Outlook}
-\label{chap:zusfas}
 
-\section*{Outlook}
+\chapter{Transaction Characteristics}
+\label{chap:tc}
+
+
+\chapter{Concept and Specification}
+\label{chap:cs}
+
+
+\chapter{Design}
+\label{chap:de}
+
+
+\chapter{Implementation and Validation}
+\label{chap:iv}
+
+
+\chapter{Conclusion and Future Work}
+\label{chap:cf}
+
+%\blinddocument
 
 \printbibliography
 
