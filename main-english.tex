@@ -24,6 +24,7 @@
   %               draft    % um zu sehen, wo noch nachgebessert werden muss - wichtig, da Bindungskorrektur mit drin
   draft=false
 ]{scrbook}
+
 \input{config}
 
 \addbibresource{bibliography.bib}
@@ -39,11 +40,10 @@ Characteristics of Permissioned Blockchain Networks},
   startdate={April 30, 2018},
   enddate={October 30, 2018}
 ]{scientific-thesis-cover}
-
 \input{acronyms}
 
 \makeindex
-
+\setcounter{tocdepth}{3}
 \begin{document}
 
 %tex4ht-Konvertierung verschönern
@@ -84,9 +84,9 @@ Characteristics of Permissioned Blockchain Networks},
 \else
   \section*{Abstract}
 \fi
-Blockchain is a ditributed ledger technology that consists of peers holding the same copy of data and it eliminates the need for a third party in exchanging assets and performing business transactions. In permissionless blockchain, any entity can participate in submitting and validationg a transaction as the entire blockchain network is public. Example of permissionless blockchain includes Ethereum and Bitcoin network. On the other hand, permissioned blockchains only allow certain entitites that have the right permission to be included in the blockchain network and to participate in the transactions proposal, execution and validation stages. Hyperledger Fabric is one such example of a permissioned blockchain involving a completely modular approach. It provides privacy and confidentiality in the blockchain network by using the concept of channels and it uses chaincode for transaction execution. \linebreak \linebreak
+Blockchain is a ditributed ledger technology that consists of peers holding the same copy of data and it eliminates the need for a third party in exchanging assets and performing business transactions. In permissionless blockchain, any entity can participate in submitting and validating a transaction as the entire blockchain network is public. Example of permissionless blockchain includes Ethereum and Bitcoin network. On the other hand, permissioned blockchains only allow certain entities that have the right permission to be included in the blockchain network and to participate in the transactions proposal, execution and validation stages. Hyperledger Fabric is one such example of a permissioned blockchain involving a completely modular approach. It provides privacy and confidentiality in the blockchain network by using the concept of channels and it uses chaincode for transaction execution. \linebreak \linebreak
 The main aim of this thesis is to investigate the transactional properties of permissioned blockchain networks like
-Hyperledger Fabric and evaluate them by comparing them to the ACID properties of RDBMS. A supply chain application has been developed that demonstrates the various business transactions like getting product details, creating a new product and updating a product. Hyperledger Fabric performs business transactions with the help of chaincodes that are deployed on peers and channels are introduced to provide privacy. A web frontend has been created that serves as a 2-P transaction monitor for writing data to different channels. Also an android application is created that gets all the products, creates products and updates existing products in the supply chain. Rollback, savepoint and nested transactions are important part of any business transactions and hence, an equivalent system that implements these concepts with blockchain is developed. Also the immutability of blockchain involving number of peers is studied and it is found that the blockchain itself is immutable but the state database on a single peer can be modified in absence of efficient endorsement policy. 
+Hyperledger Fabric and evaluate them by comparing them to the ACID properties of \glspl{rdbms}. A supply chain application has been developed that demonstrates the various business transactions like getting product details, creating a new product and updating a product. Hyperledger Fabric performs business transactions with the help of chaincodes that are deployed on peers and channels are introduced to provide privacy. A web front-end has been created that serves as a 2-P transaction monitor for writing data to different channels. Also an android application is created that gets all the products, creates products and updates existing products in the supply chain. Rollback, save-point and nested transactions are important part of any business transactions and hence, an equivalent system that implements these concepts with blockchain is developed. Also the immutability of blockchain involving number of peers is studied and it is found that the blockchain itself is immutable but the state database on a single peer can be modified in absence of efficient endorsement policy. 
 
 \cleardoublepage
 
@@ -212,7 +212,7 @@ ACID defines the transaction properties in \glspl{rdbms} that help to achieve re
 \begin{enumerate}
   \item Atomicity: The transaction is considered as an atomic unit of work and a transaction can either be committed successfully in the database or it can be aborted due to a failure but it can never be partially committed. There are two main operations \textbf{Abort} and \textbf{Commit}. It is also called as \verb|`All or nothing`| property \cite{Atomicity}.
   \item Consistency: The total value of asset in a database before a transaction and its value after the transaction(committed or aborted) is always the same. In other words, it maintains consistency by adhering to the database constraints. Inconsistent databases can lead to catastrophic events that cannot be rolled back in most cases.
-  \item Isolation: Isolation ensures that multiple transactions can take place parallely without resulting in an inconsistent state in the database. This is equivalent to the transaction result execution in sequential manner with the advantages of concurrency control. Isolation guarantees that the changes made by a transaction are only visible only after its written to the main memory.
+  \item Isolation: Isolation ensures that multiple transactions can take place parallely without resulting in an inconsistent state in the database. This is equivalent to the transaction result execution in sequential manner with the advantages of concurrency control. Isolation guarantees that the changes made by a transaction are only visible only after its written to the main memory \cite{Atomicity}.
   \item Durability: It is expected that the database remain robust in case of hardware failures and the data generated in the process of transaction execution does not get lost due to this catastrophic failure. Durability ensures that the data remains persistent in case of transaction commitment and never gets lost due to system failure. Physical storages like Hard disk are used to guarantee durability of transactions.
 \end{enumerate}
 
@@ -237,47 +237,601 @@ This thesis is divided into two main parts. In the first part we discuss the var
 \section{Outline}
 The remaining content of the document is arranged as follows:
 
-\textbf{\cref{chap:fund} - \nameref{chap:fund}} : In this chapter we will discuss the fundamentals of permissioned blockchains based on Hyperledger Fabric, difference between permissioned and permissionless blockchains on the basis of transaction processing characteristics and the types and classification of consensus algorithms and how they impact the transaction flow.
+\textbf{Chapter \ref{chap:fund} - \nameref{chap:fund}} : In this chapter we will discuss the fundamentals of permissioned blockchains based on Hyperledger Fabric, difference between permissioned and permissionless blockchains on the basis of transaction processing characteristics and the types and classification of consensus algorithms and how they impact the transaction flow.
 
-\textbf{\cref{chap:rel} - \nameref{chap:rel}} : This chapter will give an overview of the different work being carried on permissioned blockchains that impact its transaction properties.
+\textbf{Chapter \ref{chap:rel} - \nameref{chap:rel}} : This chapter will give an overview of the different work being carried on permissioned blockchains that impact its transaction properties.
 
-\textbf{\cref{chap:tc} - \nameref{chap:tc}} : This chapter will highlight the differences in the transaction processing characteristics of permissioned blockchains by comparing it with the properties of \glspl{rdbms}.
+\textbf{Chapter \ref{chap:tc} - \nameref{chap:tc}} : This chapter will highlight the differences in the transaction processing characteristics of permissioned blockchains by comparing it with the properties of \glspl{rdbms}.
 
-\textbf{\cref{chap:cs} - \nameref{chap:cs}} : In this chapter we will discuss the detailed functional and non-functional requirements and the system to be developed.
+\textbf{Chapter \ref{chap:cs} - \nameref{chap:cs}} : In this chapter we will discuss the detailed functional and non-functional requirements and the system to be developed and the developed use case for the experiments.
 
-\textbf{\cref{chap:de} - \nameref{chap:de}} : In this chapter we will define the Data model for the application and discuss the architecture of transaction flow.
+\textbf{Chapter \ref{chap:de} - \nameref{chap:de}} : In this chapter we will define different experiments performed to understand the transaction characteristics of permissioned blockchains and their corresponding results.
 
-\textbf{\cref{chap:iv} - \nameref{chap:iv}} : The actual development steps of the supply chain application will be discussed here in detail with the chaincode execution, web front-end development, channels creation and a 2-P transaction monitor.
-
-\textbf{\cref{chap:cf} - \nameref{chap:cf}} : This chapter will summarize the entire thesis work and will give us some future research possibilities.
+\textbf{Chapter \ref{chap:cf} - \nameref{chap:cf}} : This chapter will summarize the entire thesis work and will give us some future research possibilities.
 
 
 \chapter{Fundamentals}
 \label{chap:fund}
+In this chapter, we will learn about permissioned blockchains explicitly focussing on Hyperledger Fabric, which is a widely used permissioned blockchain network and has a modular architectural style, channels for privacy and confidentiality, pluggable consensus algorithms and chaincodes written in Go programming language for transaction execution \cite{HF}.
 
+\section{Introduction to Permissioned Blockchains }
+In a permissioned blockchain, the participants are usually known and identifiable. It is mostly used in scenarios where the participants are known to each other, but they have partial trust or no trust on each other \cite{HF}. In this situation, permissioned blockchain plays an important role to create a trust environment between the participants and also to take advantage of the benefits of blockchain. Permissioned blockchain is mostly used in business applications where there is exchange of money, assets, goods or any kind of important information. In order to validate and execute a transaction, permissioned blockchains use a \textit{Smart Contract Layer} that modifies data in the distributed ledger \cite{HW2}. In addition to a \textit{Smart Contract Layer}, there is a central authority that governs the rules for the participants to join the network and to authorize the participants to submit a transaction. There is also a \textit{Consensus Layer} that is used by the participants of the network to reach consensus on a block being appended and to validate the transaction executed by the Smart Contract \cite{HW1}. With all these important concepts, permissioned blockchains prove to be the right candidate to be considered for business blockchain use cases. \textit{Hyperledger Fabric} is one such example of such a permissioned blockchain network that is widely discussed and is used as a reference for the validation and study in this thesis \cite{HO}.
+\section{Hyperledger Fabric as Permissioned Blockchain Network}
+\textit{Hyperledger Fabric} is a project under the Hyperledger group of projects hosted by The Linux Foundation \footnote{\url{https://www.hyperledger.org/projects/fabric}}. It has a modular architectural design pattern where the different components are pluggable and can be switched depending upon the business requirements \cite{HF}. For e.g. depending upon the requirements of the business, the consensus algorithm can be either \gls{cft} or \gls{bft}. Similarly, channels can also be included to provide a higher degree of confidentiality and privacy among a subset of participants. Compared to the \textit{Order - Execute} architectural style followed by most permissionless blockchains, \textit{Hyperledger Fabric} follows an \textit{Execute - Order - Validate} architectural style that yields more deterministic results \cite{HF}. The different components of \textit{Hyperledger Fabric} and their importance is described in the coming sections.
+\subsection{Consensus}
+\textit{Hyperledger Fabric} includes a pluggable consensus algorithm functionality that can be switched depending upon the business requirements \cite{Con}\cite{HW1}. Due to the distributed architecture, it becomes extremely important to agree to a generated block based on some rules. These rules are called as the \textit{Consensus} \cite{HFO}. \textit{Consensus} in a \textit{Hyperledger Fabric} guarantees the ordering of transactions by the \textit{Ordering Service} and also validates the blocks generated by transactions \cite{HW1}. The important functions that \textit{Consensus} provides are:
+\begin{enumerate}
+\item It verifies the rightness of the transactions in a block generated after the success of the endorsement and consensus policies \cite{HW1}.
+\item With the help of Consensus, the Ordering Service verifies the correct ordering of transactions in a block and hence, helps in achieving deterministic results globally \cite{HF}. 
+\item Works in combination with the \textit{Smart Contracts} to verify the correctness of transactions that have to be included in the block. In Hyperledger Fabric, Consensus also verifies if the proper peers have endorsed the transactions to be considered for the transaction as valid \cite{HF}.
+\end{enumerate}
+\subsubsection{Types of Consensus Systems and their classification}
+Consensus can be classified on the basis of the fault-tolerant model of the blockchain architecture, transaction execution model of the blockchain transaction flow, method of block selection by the network, the types of peers or depending upon the method of ordering of the transactions.
+
+\begin{center}
+\begin{table}[h]
+\resizebox{\linewidth}{!}{
+\begin{tabular}{ |ccc| } 
+ \hline
+ Classification basis & Type 1 & Type 2 \\ 
+ \hline
+ Method of block selection & Lottery-based & Voting-based \\ 
+ Type of Fault Tolerance models & Byzantine Fault Tolerant & Crash Fault Tolerant \\ 
+ Type of peers & Competing peers & Non-competing peers \\
+ Method of transaction ordering & Reputation systems & Ordering service \\
+ Transaction execution model & Order - Execute architecture & Execute - Order - Validate architecture \\
+ \hline
+ 
+\end{tabular}
+}
+\caption{Table showing classification of consensus types.}
+\end{table}
+\end{center}
+\paragraph{Method of Block selection}
+\begin{enumerate}
+    \item \textbf{Lottery - based algorithms}: In \textit{lottery-based} algorithms like \gls{poet} and \gls{pow}, the winner of the lottery process is selected that proposes the new block that has to be appended in the blockchain \cite{Con}. This block is then transmitted to the rest of the network \cite{HW1}. The major advantage of such a model is that it is highly scalable since only the winner of the lottery proposes the block. \textit{Forking} is a major disadvantage in case there are multiple winners and this leads to longer time to achieve a final state or \textit{finality} \cite{HW1}.
+    \item \textbf{Voting - based algorithms}: In \textit{voting-based} algorithms majority of the nodes validate the blocks or transactions and only after that it is considered for inclusion in the blockchain given that the policies are met \cite{HW1}. Examples of \textit{voting-based} algorithms include \gls{rbft} and Paxos \cite{HW1}. Since majority of the nodes agree upon the validity of the blocks, \textit{finality} is achieved very fast. The major disadvantage of such a network is the trade-off between speed and scalability as nodes transfer messages to each other. More the number of nodes in the network, more time it will take to agree on a result \cite{HW1}.
+\end{enumerate}
+
+\paragraph{Type of Fault Tolerance models}
+\begin{enumerate}
+    \item \textbf{\gls{bft}}: These type of consensus protocols have the ability to tolerate \textit{Byzantine} nodes. Such models take care of reaching the consensus even in case of a malicious node in the network. \gls{pbft} is one such example of a \gls{bft} algorithm. In a system of \textit{n} nodes, \gls{pbft} protocol can tolerate a maximum of \textit{f < n/3} nodes, where \textit{f} is the number of faulty or malicious nodes \cite{Con}.
+    \item \textbf{\gls{cft}}: In these models the main focus is on the reliable broadcast and not on the importance of the content in the broadcast \cite{Con}. It is also called as \textit{atomic broadcast} which means either the broadcast is successful on all the nodes or on none \cite{Con}. Every node can broadcast a transaction \textit{x} by calling \textit{broadcast(x)} and this will result in an event \textit{deliver(x)} to the application \cite{Con}. Example of such an algorithm is Apache Kafka \cite{AK}.
+\end{enumerate}
+
+\paragraph{Type of Peers}
+\begin{enumerate}
+    \item \textbf{Competing peers}: In this type of consensus protocols, the peers are always competing with each other on the next block to be appended in the blockchain. The major disadvantage is that all the peers are working on the same data and this results in considerable wastage of resources. Examples include the \gls{pow} family of algorithms.
+    \item \textbf{Non-competing peers}: In this type of consensus model, not all the peers have the same responsibility and the work can be divided that can save a lot of resources. Some of the peers can work on block creation, while other peers can validate or endorse the block for its correctness. Examples include \gls{pbft}.
+\end{enumerate}
+
+\paragraph{Method of transaction ordering}
+\begin{enumerate}
+    \item \textbf{Reputation systems}: Reputation systems are used for ordering the transactions in a block. The system assigns reputation to the nodes based on certain factors like the time that each node is registered in the system, total number of successful transactions and if the node was successful in the past to detect failures. Example of such a consensus protocol include \textit{Sumeragi} \cite{HW1}.
+    \item \textbf{Ordering service}: In this type of models, a fixed node is always responsible for ordering the transactions in the block and this node is called as the \textit{Ordering Service node}. The ordering service can be composed of multiple nodes but the results generated by all the nodes are deterministic and this helps to achieve total-order in the blocks generated. Examples of such type of model include \gls{pbft} algorithm \cite{HF}.
+\end{enumerate}
+
+\paragraph{Transaction execution model}
+\begin{enumerate}
+    \item \textbf{Order-Execute architecture}: This is related to the architectural style of the system to agree on a transaction or block. In this style, first the ordering of transaction takes place an then the execution of transactions by the nodes. All the peers have to execute the transaction sequentially within a block and across the block. This results in less throughput due to the sequential execution. Example includes the \gls{pow} family of algorithms \cite{HF}.
+    \item \textbf{Execute-Order-Validate architecture}: In this model, client sends transactions to peers that are specified by the endorsement policy. The ordering service then orders the executed transactions into blocks. The committing peers then validate the output against the endorsement and consensus policies and then commit the block into the blockchain. Examples based on such model include the \gls{pbft} algorithm implemented in Hyperledger Fabric ordering service.
+\end{enumerate}
+
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=\textwidth]{graphics/consensus.pdf}
+\caption{Comparison of commonly used Consensus algorithms in Permissioned blockchains \cite{HW1}}.
+\label{fig:consen}
+\end{center}
+\end{figure}
+
+\subsubsection{Consensus Properties}
+The consensus protocols must always satisfy two important properties among the peers: \textbf{safety} and \textbf{liveness} \cite{HW1}.
+\begin{enumerate}
+\item \textbf{Safety}: Safety property of any consensus algorithm ensures deterministic results on all the nodes. A transaction is called as deterministic if the same operation performed across different peers returns the same output no matter the time and order of execution. Safety property ensures that the algorithm behaves like a single node system that executes and validates transactions atomically and one at a time \cite{HW1}.
+
+\item \textbf{Liveness}: Liveness is an important property that deals with the eventual delivery of transactions. It ensures that every non-faulty peer in the system will receive the transaction at one point of time or the other given that the communication mechanism is not down and the system can synchronize in case of failures \cite{HW1}.
+\end{enumerate}
+
+
+
+\subsection{Membership Service Provider (MSP)}
+In a permissioned blockchain network, every participating entity is assigned a unique identity. This identity is wrapped around in an X.509 digital certificate \cite{Identity}. With the help of these identities, the permissioned blockchain network decides who has the proper rights and authorization to submit a transaction or who can access the resources. An \gls{msp} defines the Root \glspl{ca} and intermediate \glspl{ca} of a blockchain trust network. In a permissioned blockchain scenario, an organization is the trusted entity \cite{Membership}. An \gls{msp} also defines the access rights for different participants of the network and the channel. For e.g. some peers in a Hyperledger Fabric network may only have read access and no write access to the ledger. This is taken care by the \gls{msp}. The \gls{msp} configuration is available on the channels as well as on the peers, orderers, clients to authenticate a member outside the context of the channel \cite{Membership}.
+
+\subsubsection{Channel and Local \glspl{msp}}
+\glspl{msp} can be either present on the channel configuration information and is called as \textit{channel \gls{msp}} or it may be present locally on the peer, orderer or the client and is called as a \textit{local \gls{msp}}. In case of peers and orderers, the \gls{msp} defines the access privileges for them whereas in case of the client the \gls{msp} allows to identify the user in the transactions on the channel or if the user has a specific role like \textit{admin} in the system \cite{Membership}. 
+
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=\textwidth]{mem.png}
+\caption{Figure showing how a local MSP is stored on a local file system \cite{Membership}}.
+\label{fig:mem}
+\end{center}
+\end{figure}
+
+\subsubsection{\gls{msp} Structure}
+In addition to the root or intermediate \glspl{ca}, there are many other important aspects in a membership for the organization. Figure \ref{fig:mem} shows the local \gls{msp} structure on a local file system. The importance of the various components of an \gls{msp} can be described as follows:
+\begin{itemize}
+  \item \textbf{Root \glspl{ca}}: This is an important folder in the \gls{msp} file system that contains the X.509 certificates of the Root \glspl{ca} that is related to the organization's \gls{msp}. From the Root \glspl{ca} all other certificates for other members are derived \cite{Membership}.
+  \item \textbf{Intermediate \glspl{ca}}: This is a folder on the local \gls{msp} file system that contains the X.509 certificates of the intermediate \glspl{ca}. The intermediate \gls{ca} certificate has to be signed by at least one of the Root \glspl{ca} of that organization. The intermediate \gls{ca} is important when a particular organization is part of a larger blockchain network and where it has more than one subdivisions. For e.g. \textit{Org1} can have two subdivisions as \textit{Org1-Manufacturer} and \textit{Org1-Supplier}. Depending upon the channel on which the organization is present, it can take a particular subdivision role and the intermediate \gls{ca} for that subdivision is then used to issue certificates to the members of the organization on the channel \cite{Membership}.
+  \item \textbf{\glspl{ou}}: The \glspl{ou} provide a list of the organizational units that are the members of the network and represented by the organization issuing the \gls{msp}. This is useful when the members of an organization have to be restricted to be having a particular identity signed by the designated \glspl{ca}. The \glspl{ou} specification is optional and if its is not specified, all the identities identified by the Root \gls{ca} and Intermediate \gls{ca} will become the members of the organization with the write privileges \cite{Membership}.
+  \item \textbf{Administrators}: There is a folder for the administrators in the local \gls{msp} that defines the administrator identity for a given organization represented by the specific \gls{msp}. Generally, at least one administrator identity should be defined for an organization. The admin rights are not with the management of resources but it is determined by the specific policies used for the managing the system resources. For example, the policy of the channel may define that \textit{Org1-Manufacturer} administrator has the rights to add new organizations to a channel and the \textit{Org1-Supplier} has no such administrator rights. The \textbf{Role} attribute is also defined in the X.509 certificate as admin. The role is strictly within the organization and not on the entire blockchain network \cite{Membership}.
+  \item \textbf{Revoked Certificates}: The identifying information about a revoked identity in a network is held in this folder. This contains a pair of strings known as Subject Key Identifier (SKI) and Authority Access Identifier (AKI). The administrator of an organization has the responsibility to advertise the updated Certificate Revocation List (CRL) to revoke an actor of its rights in the network \cite{Membership}.
+  \item \textbf{Node Identity}: This folder contains the identifying information for the nodes or peers in the blockchain network. This is used whenever a node sends a transaction proposal for endorsement, the signed endorsed transaction response and when a node wants to commit the transaction or block on the blockchain. This is a mandatory folder for the local \glspl{msp} and there should be exactly one X.509 certificate for the peer \cite{Membership}.
+  \item \textbf{KeyStore for Private Key}: This folder contains the node's \textit{signing key}. The \textit{signing key} is used as an identifier for the node whenever a transaction response is signed by the node. This signature is then used by other nodes in the network to verify the authenticity of the transaction result at the endorsement phase. This is a mandatory folder for the local \glspl{msp}. Channel \glspl{msp} do not have this folder as the main aim of channel \glspl{msp} is to work on the validation and not on verification of signing by the nodes \cite{Membership}.
+  \item \textbf{TLS Root CA}: This folder contains the X.509 certificates of the Root \glspl{ca} for TLS communications. This is important in case the nodes want to communicate with each other regarding the ledger updates and when new nodes want to securely join the channel. It is mandatory to have at least one TLS Root \gls{ca} X.509 certificate in the respective folder \cite{Membership}.
+  \item \textbf{TLS Intermediate CA}: This folder contains the X.509 certificates of the Intermediate \glspl{ca} for TLS communications. It is important when there is a need of commercial \glspl{ca} for generating TLS certificates of an organization. This is an optional attribute and can remain empty \cite{Membership}.
+\end{itemize}
+
+\subsection{Chaincodes}
+Chaincodes are the programs that contain the actual business logic of the blockchain application and it is used to access the \textit{world state} data of the blockchain. Chaincode is similar to a \textit{Smart Contract} in Ethereum or a \textit{Stored Procedure} in the traditional \glspl{rdbms} \cite{HF}. It is a self executing piece of code that is installed and instantiated on the peers of a Hyperledger Fabric channel. The client application invokes the various chaincode functions by interfacing it with a network peer. The transactions executed by the chaincode are checked for validation by the committing peers and upon complete validation the transactions results from a chaincode execution are used to update the shared ledger and change the world state. Currently, Hyperledger Fabric supports different programming languages in which chaincode can be written. These includes \textit{Go}, \textit{node.js} or \textit{Java}. Chaincode has its own secure docker environment that runs loosely coupled from the corresponding peer containers \cite{HF}. The state generated by a chaincode cannot be directly accessed by a different chaincode. If the chaincodes are in the same network, the state of chaincode can be accessed with right permissions \cite{Chaincode}. 
+
+\subsubsection{Types of chaincodes in Hyperledger Fabric}
+\begin{itemize}
+    \item \textbf{System chaincode}: Transactions like the chaincode lifecycle management and and Fabric policy configuration are handled by some special system transactions executed by the \textit{System chaincodes} \cite{HW2}. The System chaincodes can also be used to specify the application requirements depending upon the requirements of the network and the chaincode developers can program it according to the needs of the application. The \textit{\gls{escc}} is a special system chaincodes that handle the endorsement related transactions. The \gls{escc} takes a transaction proposal and the result as input and produces a response with the results and the endorsement signature \cite{HF}. The \textit{\gls{vscc}} is responsible for checking the validity of the transaction. It takes the input as transaction and the output is a response indicating if the transaction is valid or not \cite{HF}. There is also a \textit{\gls{mvcc}} that checks for the versions of the key-value store before committing it to the world state. This is especially useful to avoid \textit{double-spending}.
+    \item \textbf{Application chaincode}: The applications states on the distributed ledger is maintained by the application chaincode that includes assets, data records or funds \cite{HW2}. The client invokes the application chaincode methods with the help of the API and submit a request for transaction. Every transaction is associated with a transaction ID that is stored in the append only ledger.
+\end{itemize}
+
+\subsubsection{Chaincode usage scenarios}
+There are generally two different ways to define and develop chaincodes for the Hyperledger Fabric architecture:
+\begin{itemize}
+    \item \textbf{Using chaincodes to design business contracts}: The chaincode can be used as a standalone application instance that gets invoked automatically when a condition is met or it can be programmed and accessed with the help of an API and called from the client application whenever required \cite{HW2}.
+    \item \textbf{Using chaincodes to manage assets in a network}: Chaincodes can be used to transfer the assets in a network between the participants. Account balances can be encoded into past transactions records and it is called as the \gls{utxo} model that is stateless. Chaincodes can also use the ledger state to store the asset value and its current holder and regularly modifying the world state as the asset moves in the network \cite{HW2}.
+\end{itemize}
+
+\subsection{Endorsement Policy}
+Endorsement policy is defined on the chaincode and it states the set of peers or nodes on a particular channel that have to execute the the chaincode method and endorse the results obtained from execution for the transaction to be deemed as valid. It is a way of defining which organizations have to approve of a result before finally appending it to the ledger and modifying the world state \cite{Endorsement}. It is the responsibility of the validating peers to check for the appropriate number of endorsements for a transaction from the right sources as defined in the endorsement policy. The validating peers also checks for the signatures of peers in the endorsement for authenticity and authorization.
+\begin{Listing}
+  \begin{lstlisting}
+peer chaincode instantiate -C <channelid> -n cc -P "OR('Org1.member', 'Org2.member')"
+\end{lstlisting}
+  \caption{Endorsement policy specification at the time of chaincode instantiation.}
+  \label{lst:endo}
+\end{Listing}
+\subsubsection{Endorsement policy types}
+Generally, endorsement is defined at the time of chaincode instantiation or upgrade and it common for all the functions of the chaincode execution. However, there are some instances where a more sophisticated endorsement policy has to defined at the key level. Lets us see the difference between the two
+\begin{itemize}
+    \item \textbf{Chaincode level endorsement policies}: When the chaincode is instantiated on a channel, it is possible to define the endorsement policy for that chaincode on that specific channel. It is specified with the \textbf{-P} switch in the CLI command. Listing \ref{lst:endo} shows the sample CLI command used to instantiate the chaincode on a channel with the endorsement policy specified with a \textbf{-P} switch. The command specifies that a chaincode with name \textit{cc} will be deployed on the peer and channel specified by the \textit{channelid} with an endorsement policy \textit{'Org1.member', 'Org2.member'}. This endorsement policy states that the transaction on the channel has to be either endorsed by a member of organization \textit{Org1} or \textit{Org2}. Whenever a new organization is added to the network channel, the endorsement policy has to be modified \cite{Endorsement}.
+    \item \textbf{Key-level endorsement policies}: The chaincode level endorsement policies are bound to the lifecycle of the chaincode. The key-level endorsement policies can be updated from within a chaincode function and is considered as a transaction. If there is no key-level endorsement policy present, the chaincode endorsement policies are executed in general. Even if the key-level endorsement policy is present, the transaction to create a key-level endorsement policy has to met the chaincode endorsement policy specification. If a transaction involves modification of a key containing a key-level endorsement policy, the key-level policy will override the chaincode level policies. A particular key can have multiple key-level endorsement policies and all of them have to be satisfied for key update \cite{Endorsement}. 
+\end{itemize}
+\subsubsection{Roles in endorsement policy}
+The endorsement policies are always specified in combination with the \glspl{msp} and the role of different nodes in the network. In general it takes the form \textit{'MSP.ROLE'} where MSP defines the associated MSP ID in the network and ROLE represents the associated roles with the \gls{msp} in the network \cite{Endorsement}. Some examples are:
+\begin{itemize}
+\item \textbf{'Org1.admin'}: This specifies the administrator of organization \textit{Org1} MSP.
+\item \textbf{'Org2.member'}: This specifies any member of organization \textit{Org2} MSP.
+\item \textbf{'Org3.client'}: This specifies any client of organization \textit{Org3} MSP.
+\item \textbf{'Org4.peer'}: This specifies any peer of organization \textit{Org4} MSP.
+\end{itemize}
+
+\subsubsection{Syntax of the language}
+There is a way of defining the policy in combination with the roles and the msp and a principal like \textit{AND}, \textit{OR} and \textit{OutOf}. Some examples are:
+\begin{itemize}
+\item \textbf{AND('Org2.peer', 'Org3.peer')}: This specifies that at least one signature from both the organization's peers.
+\item \textbf{OR('Org2.peer', 'Org3.peer')}: This specifies that at least one signature from any one of the organization's peers.
+\item \textbf{OutOf(1, 'Org2.peer', 'Org3.peer')}: This specifies that at least one signature from any one of the organization's peers. Similar to \textit{OR} policy in this case.
+\end{itemize}
+
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=\textwidth]{channel.png}
+\caption{Figure showing a blockchain network with two organizations, their corresponding MSP, the peer, the orderer and the channel \cite{Membership}}.
+\label{fig:channel}
+\end{center}
+\end{figure}
+
+\subsection{Channels}
+Hyperledger Fabric has the channel capabilities for a subset of participants in a blockchain network to provide some form of confidentiality and privacy. Channels are a useful feature when there are competitors involved on the same blockchain network and they do not want to share any sensitive information that might undermine their business profits. The shared ledger, chaincode applications, the ordering service node(s), members of the organization and the anchor peers per member define the channel. The transactions are checked for authentication and authorization on the channel where they are executed. The channel identifies each peer joining the channel by the \gls{msp} of that organization to authenticate it \cite{Channels}.
+
+The client SDK calls the configuration system chaincode and checks the properties like the anchor peers, members of the organizations to create a new channel. The first step in channel creation is the generation of a genesis block for the common channel ledger. The genesis block stores the channel configuration information about the channel members, anchor peers and the endorsement policies. When a new member is added to an existing channel, the genesis block containing all the required information is shared with the new member \cite{Channels}. Figure \ref{fig:channel} shows a typical channel created for the two organizations. The peers that are part of this channel can submit and invoke transactions on the channel ledger. Listing \ref{lst:chan} shows the sample peer commands that can be used to create a channel and join the peer to the channel \cite{Channels}.
+
+It is not possible to pass data from one channel to another which is secured by configuration chaincode, the gossip data dissemination protocol and the identity membership service. Channels are similar to the private access modifiers in a object oriented class providing access only to the right members of the channels. It is however important to note that chaincodes can be called from different channels but only for querying and it cannot be used for updating the ledger.
+\begin{Listing}
+  \begin{lstlisting}
+peer channel create -o <ordering-service url> -c <channelName> -f <channel.tx file> --cafile<path to the peer identity file>
+    
+peer channel join -b <genesis-block.block>
+\end{lstlisting}
+  \caption{Different peer commands to create a channel and to join the peer to the created channel \cite{Channels}.}
+  \label{lst:chan}
+\end{Listing}
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{ledger.png}
+\caption{Figure showing a Ledger consisting of the world state and the blockchain \cite{Ledger}}.
+\label{figure:ledger}
+\end{center}
+\end{figure}
+
+\subsection{Ledger}
+The Ledger in Hyperledger Fabric consists of two different components, the \textbf{world state} and the \textbf{blockchain}. The world state holds the current value of a key. So whenever a new transaction is invoked and if it is successful the world state gets updated with the value obtained in the transaction execution. Whenever a peer queries the chaincode for a key value, the queries are run against the world state to give the result back. The world state is stored as a key-value pair dataset. The blockchain contains the history of all the transactions and can be considered as an historical log. The world state can be generated any time by traversing the entire blockchain. It is immutable and once transactions are appended they cannot be modified \cite{Ledger} \cite{HF}. Figure \ref{figure:ledger} shows a Ledger L comprising of a world state W and the blockchain B. The world state W can always be generated from the blockchain B. The different members of a blockchain network contain the same consistent copy of the ledger.
+
+\subsubsection{World State}
+World state contains the current value for any key and can be accessed from the chaincode without the need to traverse the entire history of the blockchain. The chaincodes can access the world state key values and modify it with the API interfaces like \textbf{GetState}, \textbf{PutState} and \textbf{DeleteState}. The state values can be either simple with just a single value like \textit{\{key=Vehicle1, value="Truck"\}} or complex consisting of multiple value fields like \textit{\{key=Vehicle1, value=\{type:"2-wheeler", color:"red"\}\}}. 
+
+It is important to note that only those transactions that have the required number of endorsements as per the endorsement policy can change the world state. The state or the key-value pair are always associated with a version number. Every time a key gets updated, its version number gets incremented by 1. Initially when a ledger is created the world state is empty and subsequently gets populated when transactions are endorsed and committed in the blockchain\cite{Ledger}.
+
+\begin{figure}[b!]
+\begin{center}
+\includegraphics[width=\textwidth]{blockchain.png}
+\caption{Figure showing the structure of the blockchain ledger \cite{Ledger}}.
+\label{fig:blockchain}
+\end{center}
+\end{figure}
+
+\subsubsection{Blockchain}
+The blockchain part of the ledger contains the history of transaction logs and it is considered as append only and immutable. The blocks in the blockchain are interlinked with each block containing a sequence of transactions. The block's header includes a hash of the previous block header and the hash of all the transactions in the block. This hashing makes the blockchain secure and tampering can be easily detected as the blockchain itself is distributed. The world state is implemented as a database whereas the blockchain is designed as a file. Since, its append only, the file structure is much more appropriate \cite{Ledger}.
+
+Figure \ref{fig:blockchain} shows the typical blockchain file structure consisting of interlinked blocks. It states that the Blockchain B is composed of blocks B0, B1, B2, B3. B0 is the genesis block in the network that contains configuration transaction and is the starting point of the blockchain. The block B3 contains block data D3 consisting of all the transactions T8 and T9. Header H3 of block B3 contains the hash of transactions T8 and T9 as well as the hash of the previous block B2's header H2.
+
+
+\subsection{Data storage}
+As discussed in the previous section, the world state is implemented as a database unlike the file system of the blockchain. The world state key values can be simple or complex and Hyperledger Fabric provides two different database options for the world state : \textit{LevelDB} \cite{ldb} and \textit{CouchDB} \cite{cdb}.
+
+\subsubsection{LevelDB}
+LevelDB is the default data store in Hyperledger Fabric and it is embedded within the peer operating system process. In other words, it is tightly coupled with the peer process and its life cycle is associated with the peer node. It is especially useful when the ledger states are simple key-value pairs \cite{Ledger}.
+
+\subsubsection{CouchDB}
+CouchDB supports rich and complex queries and supports simple datatypes and JSON documents for the ledger states. As a result CouchDB cab be used for efficient queries that is the main requirement of a business transaction. It runs in a separate environment than the peer operating system process but has a one to one mapping with the corresponding peer process.
+
+Thus with the requirements of the business, different databases can be implemented as a relational data store, temporal data store or a graph structure. Hyperledger Fabric provides pluggable data store functionality \cite{Ledger}.
+\section{Hyperledger Sawtooth as Permissioned Blockchain Network}
+Hyperledger Sawtooth is a part of the Hyperledger group of projects hosted by the Linux Foundation. It is designed particularly for enterprise use due to its modular design that allows the applications to choose access control, transaction rules and consensus mechanisms in the blockchain network \cite{saw}. 
+\subsection{Characteristics of Hyperledger Sawtooth}
+\begin{enumerate}
+    \item \textbf{Clear separation between the core system and application}: Sawtooth provides a smart contract abstraction layer that facilitates the applications developers to use a language of their choice to develop the smart contracts \cite{saw}.
+    \item \textbf{Private groups with access control}: Separate access control can be specified for a group of nodes as the blockchain maintains stores the configuration information for access control for all participants to quickly access it \cite{saw}.
+    \item \textbf{Parallel transaction execution}: With the help of a parallel scheduler, Sawtooth executes transactions parallely while still taking into consideration the transaction dependencies \cite{saw}.
+    \item \textbf{Event system}: Sawtooth provides a way to subscribe to events so that the nodes can be notified \cite{saw}.
+    \item \textbf{Pluggable consensus protocols}: Just like Fabric, Sawtooth also provided a pluggable mechanism to select the consensus algorithms depending upon the need of the network \cite{saw}.
+    \item \textbf{Sample transaction families}: Just as Fabric has chaincodes, Sawtooth provided predefined transaction families and user-defined transaction transaction families as models. For example, the \textbf{IntegerKey} transaction family is used to test the deployed ledger \cite{saw}.
+\end{enumerate}
+
+\subsection{Transactions and Batches in Sawtooth}
+In Sawtooth, transactions that are successfully executed result in state changes. Transactions are included in \textbf{batches}. A batch is an atomic unit of work in Hyperledger Sawtooth \cite{saw}. This implies that either all the transactions in a batch are committed or none at all.
+
+\subsubsection{Dependencies between transactions}
+There are instances when a transaction execution is dependent on the successful execution of some other transactions and this results in a form of \textit{dependency}. There is \textit{dependency} field in the transaction proposal in Sawtooth that specifies the dependent transaction \cite{saw}. This is called \textbf{explicit dependency} if it is specified by the client and allows two dependent transactions to be included in different batches but executed in right order. The parallel scheduler in Sawtooth takes care of \textbf{implicit dependencies} by interacting with the state. There is a input and output field in transaction proposal that specifies the address of the state \cite{saw}.
+
+\subsubsection{Importance of batches}
+Batches are the atomic unit of work in Sawtooth. If there is a invalid transaction in a batch, the batch is not applied and it is rejected. This helps to avoid the explicit dependency for transactions in the same batch as transactions are sequentially executed. External dependencies have to be specified only if the dependent transactions are in different batches \cite{saw}.
+
+If there is a \textit{cyclic dependency} between the transactions, it cannot be solved with \textit{explicit dependency} specification at the transaction level. Suppose there are three transactions \textbf{X}, \textbf{Y}, \textbf{Z} that have to be applied in the same order. When a cyclic dependency is present between them, this cannot be defined with explicit dependencies alone. Batches solve this problem by executing the transactions in an ordered manner and rejecting the entire batch if any transaction fails. Dependencies specify the ordering of transaction execution and this fails in scenarios where there is a cyclic dependency as it cannot be specified in the transaction \cite{saw}.
 
 \chapter{Related Work}
 \label{chap:rel}
+In this chapter, we will discuss the two important reference work done on blockchains related to the transaction characteristics analysis. These two are important as they highlight the differences between the permissionless and permissioned blockchain networks. In Section \ref{sec:1}, the permissionless blockchains are studied for their transactional properties. In Section \ref{sec:2}, Hyperledger Fabric and its underlying architecture is discussed which is used as a reference for further study in the thesis.
 
+\section{A Transaction Processing Perspective on Blockchains}
+\label{sec:1}
+In this keynote paper, Tai et.al. discuss the transactions characteristics of blockchains \cite{Salt}. A different model called \textbf{SALT} is proposed for the blockchain transactions.
 
-\chapter{Transaction Characteristics}
+\subsection{Motivation}
+The \glspl{rdbms} transactions focus on achieving database consistency while BASE is a model that trades some consistency for availability. With the introduction of blockchains that emphasize on distributed peer-to-peer technology and immutable ledger, another model in place ACID and BASE has to be introduced as blockchain transactions are consensus driven.This model introduced by Tai et.al. is called as SALT \cite{Salt}.
+
+\subsection{Study Approach}
+Blockchain transactions are consensus driven and have different properties compared to ACID and BASE models. Blocks contain transactions and it is important to study the blockchains from transaction perspective as well as block or system perspective. In this study, two real world application example of blockchain are used for comparison and evaluation of transaction properties. One use case involves Monegraph \cite{mon} which is an online digital media platform to share or sell media rights to different media users. The second use case uses Provenance blockchain \cite{pro} that is a supply chain traceability  application providing information about a product as it flows in the supply chain. 
+
+Both the use cases were studied from a transaction and system perspective and the results were concurrent. The blockchain transactions were characterized as \textit{Sequential}, \textit{Agreed}, \textit{Ledgered} and \textit{Tamper-Resistant} from a transactions perspective. From a system perspective, these transactions were characterized as \textit{Symmetric}, \textit{Admin-free}, \textit{Ledgered} and \textit{Time-consensual} \cite{Salt}.
+
+However, it is also important to note that the study was done on the permissionless blockchain networks and thus, it highlights the transactional properties of permissionless blockchains.
+
+\section{Hyperledger Fabric: A distributed Operating System for Permissioned Blockchains}
+\label{sec:2}
+This paper describes the modular architecture of Hyperledger Fabric and its various components like consensus algorithms, smart contraction layer, transaction flow, peer communication, ledger, etc. With the help of this study, we get a deep understanding of permissioned blockchain network like Hyperledger Fabric.
+
+\subsection{Motivation}
+Androulaki et. al. describe the working of Fabric and its underlying architectural style and the programming setup required to build a permissioned blockchain model. Fabric is the first blockchain system that runs distributed applications without systemic dependency on a native cryptocurrency. This is quite opposite to the permissionless blockchains that require cryptocurrency for transaction execution. Fabric uses portable membership concept combined with identity management for access control. It uses the architectural model for transaction processing called as execute-order-validate model that removes non-determinism from the smart contracts. These properties make Fabric an ideal candidate for study related to the transaction processing \cite{HF}. 
+
+\subsection{Study approach}
+The study in this paper highlights the difference between the order-execute architecture model used in permissionless blockchains and early permissioned blockchains and the execute-order-validate architecture model of Hyperledger Fabric. For the purpose of study, a authority minted cryptocurrency similar to that of Bitcoin is used which is defined as \textit{Fabcoin} in the paper \cite{HF}. The study is focussed on the customization of the validation phase and the endorsement policy. The developed model is used for benchmarking of permissioned blockchains.
+
+\section{Blockchain Consensus Protocols in the Wild}
+Cachin and Vukoli´c \cite{Con} wrote a paper on the different consensus models for blockchain that include crash tolerant and byzantine tolerant models.
+
+\subsection{Motivation}
+Blockchain transactions are based on consensus mechanism and it is essential to have an efficient consensus algorithm so that the transactions are secure and resilient. The main aim of consensus is to agree on the data and the order in which the transactions are executed. There are chances that a particular blockchain network can have adversarial nodes in the system and hence, a blockchain system should be able to tolerate Byzantine faults. 
+
+\subsection{Study Approach}
+Cachin and Vukoli´c review the different consensus protocols in some prominent permissioned blockchain platforms and analyze their fault models and resilience against attacks. The protocol comparison covers Hyperledger Fabric, Tendermint, Symbiont, Iroha, Kadena, Chain,  Ripple, Stellar, and others \cite{Con}. Figure \ref{fig:conT} shows the consensus resilience properties in different blockchains.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=10cm,height=10cm,keepaspectratio]{conTable.png}
+\caption{Summary of consensus resilience properties, some of which use statically configured nodes
+with a special role. Symbols and notes: ‘X’ means that the protocol is resilient against the fault and ‘−’
+that it is not; ‘.’ states that no such special node exists in the protocol; ‘?’ denotes that the properties
+cannot be assessed due to lack of information; (X) denotes the crash of other nodes, different from the
+special node; + MultiChain has non-final decisions; ⊕ PoET assumes trusted hardware available from
+only one vendor; ⊗ Ripple tolerates one of the five default Ripple-operated validators (special nodes) to
+be subverted \cite{Con}}.
+\label{fig:conT}
+\end{center}
+\end{figure}
+
+\chapter{Blockchain Transaction Characteristics}
+In this chapter, we will see the various transaction characteristics of permissioned blockchain network by studying the Hyperledger Fabric framework. We will compare the transaction properties of Hyperledger Fabric with that of the permissionless blockchain networks and the \glspl{rdbms} for a proper understanding. The effect of various components like \textit{channels}, \textit{chaincodes}, \textit{endorsement policies} and \textit{consensus algorithms} on the transaction properties will be studied here.
 \label{chap:tc}
 
+\section{Permissionless blockchain transaction properties}
+Permissionless blockchains like Ethereum have been studied by comparing it to traditional \glspl{rdbms}'s ACID model and with the cloud systems and NoSQL data store's BASE model \cite{Salt}. The permissionless blockchains can be characterized as \textit{Sequential}, \textit{Agreed}, \textit{Ledgered}, and \textit{Tamper-resistant} from the transaction perspective, and as \textit{Symmetric}, \textit{Admin-free}, \textit{Ledgered}, and \textit{Time-consensual} from the transaction processing systems perspective \cite{Salt}. The focus of blockchain transactions is mainly on trustless transactions at the cost of scalability whereas ACID favors consistency at the cost of availability \cite{Tai}. the two perspectives of blockchains transactions can be described as in the below subsections. 
 
-\chapter{Concept and Specification}
+\subsection{Blockchain transactions-Transaction view}
+As discussed before, permissionless blockchain transactions can be described as \textit{Sequential}, \textit{Agreed}, \textit{Ledgered} and \textit{Tamper-resistant} \cite{Salt}. Transactions are written on the blockchain and successful transactions update the world state of the ledger.
+
+\subsubsection{Sequential}
+The transactions in a blockchain network are executed sequentially. ACID transactions have the important characteristics of parallel transaction execution that increase the throughput of the system. However, in permissionless blockchains the transactions are not processed parallely and are only executed after one transaction finishes \cite{Salt}.
+
+\subsubsection{Agreed}
+In the ACID transactions, there is only one central authority that decides what data has to be added to the network. In permissionless blockchains, the transactions are added to the blocks and finally to the ledger after a consensus is achieved on the given transaction. The consensus can be reached in a variety of ways depending upon the type of consensus algorithm chosen and therefore, it is a distributed agreed transaction model \cite{Salt}.
+
+\subsubsection{Ledgered}
+The successful and consensual transactions are added to the blockchain and it cannot be tampered or changed. All the transactions are recorded in the blockchain and it is append only ledger that does not allow modifying a transaction once it is committed to the blockchain. It is also important to note that the Ledgered property is similar to the durability aspect of ACID transactions. \cite{Salt}.
+
+\subsubsection{Tamper-resistant}
+The blockchain is immutable and any effort to change the ledger can make the nodes aware of the tampering and it will be ultimately discarded. With the help of cryptography, transactions are signed by the crypto material or identity of the nodes and this helps the system to identify the right user who can submit a transaction. Furthermore, the blockchain is distributed among the network participants that work with consensus. Even if a node is compromised, other nodes in the system will discard the compromised data of the malicious or attacked node \cite{Salt}.
+
+\subsection{Blockchain transactions-System view}
+As discussed before the system perspective of permissionless blockchain transactions classifies it as \textit{Symmetric}, \textit{Admin-free}, \textit{Ledgered}, and \textit{Time-consensual} \cite{Salt}. Let us see the importance and meaning of these terms.
+
+\subsubsection{Symmetric}
+The peers in the permissionless blockchains symmetrically perform their responsibilities stating that every peer have the same processing tasks. This includes functions like data storage on the peer system, the transaction processing by signing the transactions and verifying the transactions and dissemination of information \cite{Salt}.
+
+\subsubsection{Admin-free}
+As blockchain is a peer-to-peer system and there is no administrator that has the responsibilities like network maintenance, access privileges or infrastructure management. These responsibilities are performed by all the nodes in the system in a consensual manner that helps to create a trust environment \cite{Salt}.
+
+\subsubsection{Ledgered}
+The nodes in a blockchain network maintain the ledger that is kept consistent on all the nodes with the help of the consensus property of blockchain. It is an append only transaction log that requires validation from all the nodes before adding a transaction in the logs. Blocks are a type of data structure that group transactions together. Consensus is generally reached on the blocks to reduce the number of consensus rounds and this block is then appended to the blockchain \cite{Salt}.
+
+\subsubsection{Time-consensual}
+The peers in a blockchain network may be geographically separated and hence, there is a high possibility that the blocks reach at different peers at different times. To solve this, the consensus algorithms defines an average time between which a new block can be created. This time is termed as \textit{block interval}. A transaction is therefore included into the ledger within half the block interval time but this is not guaranteed \cite{Salt}.
+
+\section{Transaction Processing Models}
+Initially, transactions in blockchain followed an \textit{order-execute} architectural style in which the network orders the transactions before sending them to all the peers in the network and then the peers execute all the transactions sequentially. The most important requirement of such a model is that it requires the transactions to be \textit{deterministic} \cite{HF}. Hyperledger Fabric follows a different architectural style for transaction processing and it is called as \textit{execute-order-validate} model \cite{HF}. In this model, the transactions are executed first, then the transactions are ordered with the help of a consensus algorithm and at the last the transactions are validated by the peers before committing it to the blockchain \cite{HF}. Let us see the details of the two models.
+
+\subsection{Order-Execute Model}
+In most blockchain networks, inclusive of permissionless and permissioned blockchains, the transaction processing model is based on the Order-Execute architectural style \cite{HF}. In this architectural style, the network first orders the transactions with the help of a consensus algorithm and then executes the transactions in the order in which they are processed on all the nodes in the network \cite{HF}. Different steps in a order-execute architecture are as follows:
+\begin{enumerate}
+    \item The nodes that participate in the consensus mechanism collects a block that contains valid transactions. The transactions are validated by the node itself by executing and verifying the results \cite{HF}.
+    \item Depending upon the type of consensus protocol, the node or peer processes the valid transaction. For example, in \gls{pow} based system, the peer will solve a \gls{pow} mathematical problem \cite{HF}.
+    \item The peer transmits the block to the network if it is successful in solving the mathematical problem.
+    \item The other peers in the network that receive the block, validate the solution to the mathematical problem and also the transactions contained in the block. The receiving peers repeat the same execution steps as that carried out by the peer that solved the problem.
+\end{enumerate}
+All the peers execute the transactions in a block one after the other sequentially. The order-execute architecture is shown in Figure \ref{fig:oe}.
+
+\subsubsection{Drawbacks of Order-Execute Model}
+The order-execute is a simple architectural model but has many serious drawbacks associated with it which can be described as follows:
+\begin{itemize}
+    \item \textbf{Non-determinism}: Non-deterministic transactions are a major problem in the order-execute architectural style. In the order-execute model, consensus on the order of transaction is reached before the execution of the transactions. This involves that the transactions on all the peers produce deterministic results irrespective of the time of execution. If the transactions are non-deterministic, it can produce \textit{forks} in the blockchain and it is against the basic principle of blockchain that every peer holds the same copy of data. Determinism can be achieved by using a domain-specific programming language like Solidity \cite{HF}. 
+    \item \textbf{Sequential transaction execution}: In a order-execute model all the peers execute the transactions in a sequential manner and this limits the overall throughput of the network to process the transactions. In addition, if a smart contract has some programming faults like an infinite loop, this can stop the entire blockchain network and proceeding transactions will remain halted forever. To solve this issue, permissionless blockchains like Ethereum use cryptocurrency to process a transaction. So even if the smart contract has programming error like an infinite loop, the cryptocurrency will get exhausted at some point of time \cite{HF}. In permissioned blockchains, this can be solved by executing the transactions in parallel. But in order to do this, transaction dependencies have to be considered before parallel transaction execution \cite{HF}.
+    \item \textbf{Confidentiality of execution}: Most blockchain networks, run smart contracts on all the nodes in the network. But if the network requires confidentiality for the transaction, ledger state or smart contract logic, this becomes difficult to achieve without overloading the system \cite{HF}. The solution could be to create a network of trusted peers that execute the smart contract and propagate the results to other peers \cite{HF}.
+\end{itemize}
+
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=\textwidth]{oe.png}
+\caption{Figure showing the order-execute architectural style in blockchain network \cite{HF}}.
+\label{fig:oe}
+\end{center}
+\end{figure}
+
+\subsection{Execute-Order-Validate Model}
+As seen in the previous subsection, the order-execute model suffers from a number of drawbacks that limits its application in the blockchain networks. This becomes very critical when business transactions are involved that have value only if executed in a secure and timely manner. To overcome the drawbacks in order-execute model, Hyperledger Fabric introduced the execute-order-validate model that solves all the major problems of the order-execute model \cite{HF}. Fabric has a smart contract called the \textit{chaincode} that performs the \textit{execution phase}. The transactions after execution are ordered by a \textit{ordering service} and this is called as the \textit{ordering phase}. In the \textit{validation phase} the ordered transactions are checked for the fulfillment of the endorsement policy \cite{HF}. Figure \ref{fig:eov} shows the transaction execution in Hyperledger Fabric by the execute-order-validate model. The importance of the three steps can be described as follows:
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{eov.png}
+\caption{The execute-order-validate architecture model of transactions in Hyperledger Fabric \cite{HF}}.
+\label{fig:eov}
+\end{center}
+\end{figure}
+
+\subsubsection{Execution phase}
+The client submits a transaction proposal by signing it to the endorsing peers in the network. The endorsing peers are specified at the time of chaincode instantiation on the channel. The transaction proposal submitted by the client contains the identifier of the chaincode, a counter or random variable, the transaction payload, parameters of the chaincode, a transaction identifier and the identity of the submitting client \cite{HF}. The chaincode is installed for the endorsing peers to generate the transaction results. This is called as creation of a \textit{proposal}. The proposal is generally executed against the local world state of the peer and the other peers have no knowledge about this state. The endorsers then produce a \textit{writeset} that consists of the keys and the new values of keys and a \textit{readset} that consists of the keys and its values read before endorsement. The signing of the message that contains the readset and the writeset is called as \textit{endorsement} that is delivered to the client as a response \cite{HF}.
+
+Execution of the transaction before ordering them helps to overcome the drawback of non-deterministic chaincode. It is also possible to abort a transaction in case of \gls{dos} attacks that was not possible with the order-execute model \cite{HF}.
+
+\subsubsection{Ordering phase}
+The proposal response from the endorsing peers is collected by the client. As per the endorsement policy specification, the client waits till it gets the right number of valid responses and assembles a transaction and delivers it to the \textit{ordering service} for ordering. The transactions is composed of the endorsements, the chaincode methods with parameters and the metadata about the transactions \cite{HF}. Ordering is a process of atomically broadcasting \cite{ab} the endorsed transactions by establishing consensus on the transactions \cite{HF}. The ordering service does the work of putting transactions in blocks that helps to improve the throughput of the system \cite{HF}. The ordering service supports two operations:
+\begin{itemize}
+    \item \textit{broadcast(txn)}: This method is called by the client to broadcast a transaction \textit{txn} in the network. The transaction contains a payload and signature of the sending client \cite{HF}.
+    \item  \textit{B\textleftarrow{}deliver(x)}: This operation is performed by the client on the orderer to retrieve a block B a sequence number as x. The block B contains a number of transactions that were included into it at the time of committing it to the ledger \cite{HF}.
+\end{itemize}
+It is the responsibility of the ordering service to ensure the blocks are fully ordered. It is important to note that the ordering service in Fabric does not execute or validate a transaction and it is concerned with the ordering of transactions. This makes the consensus process in Fabric quite modular by separating the execution and validation stages with the ordering stage \cite{HF}.
+
+\subsubsection{Validation phase}
+This is an important step before the blocks can be finally committed to the ledger. In this step the blocks are validated by the committing peers to check the content of the transactions within the block and the block itself. The steps in the validation stage are performed sequentially as: 
+\begin{enumerate}
+    \item \textit{Evaluation of endorsement policy}: This step involves parallel evaluation of the transactions in the block. The step is performed by the Validation System Chaincode \gls{vscc} that is responsible for checking the endorsement policy against the chaincode. The unsatisfied endorsements for a transaction results in the transaction becoming invalid but it is still included in the block and its effect does not take place on th ledger. It is logged for future auditing \cite{HF}.
+    \item \textit{Read-write conflict check}: This is a sequential step that is done for all the transactions in the block. In this step, the key versions in the \textit{readset} is compared with the current version of the key in the ledger state. Non-matching versions result in invalid transactions and its effect on the ledger is prohibited \cite{HF}.
+    \item \textit{Ledger update stage}: This is the last step in which the block is finally appended to the ledger and the world state is also updated with the new key values. The state changes are done by updating the key values with the \textit{writeset} of the valid transactions. Invalid transactions are still included in the block but have no effect on the world state \cite{HF}.
+\end{enumerate}
+The result of the validation stage may also contain invalid transactions in the block. This is very useful in cases when the auditing is done to identify peers that submitted faulty transactions.  
+
+
+\section{Transaction flow in Hyperledger Fabric}
+Hyperledger Fabric follows a execute-order-validate architecture to overcome the drawbacks present in the order-execute architectural model of transaction processing. Transactions in Fabric can be either \textit{Deploy transactions} that create a new chaincode for the specified peer or \textit{Invoke transactions} that perform a particular operation on a already installed chaincode. The execution may result in modification of world state because of \textit{write} or just a simple query to return a key value (read). Figure \ref{fig:tf} shows a typical transaction flow from execution, ordering to the validation of transactions in Hyperledger Fabric. The steps can be outlined as below:
+\begin{enumerate}
+    \item The client submits a transaction request that is passed to all the endorsing peers in the blockchain network. The transaction proposal is composed of the client identifier, chaincode identifier, transaction payload, timestamp and the client signature.
+    \item The endorsing peers simulate the transactions and produce a transaction response. This process is called as \textit{endorsement} and is part of the \textit{execution phase}. The endorsing peers submit the proposal response to the requesting client.
+    \item In this step, the client verifies the minimum amount of correct endorsements received on the transaction response and sends it to the ordering service to be included in the block and ultimately into the blockchain. The ordering service then orders the transactions as it receives in a sequence. This is called as \textit{ordering phase}.
+    \item In the last step, the ordering service disseminates the blocks containing the transaction simulation results to all the peers in the network and optionally to the client. The peers validate the blocks and the transactions in the block that is finally appended in the ledger. This is called as \textit{validation phase}.
+\end{enumerate}
+
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=\textwidth]{tf.png}
+\caption{Transaction flow in Hyperledger Fabric that follows an execute-order-validate architectural style \cite{hfarc}}.
+\label{fig:tf}
+\end{center}
+\end{figure}
+
+
+\section{Hyperledger Fabric transactional properties from an ACID perspective}
+We have already seen the transaction flow in Hyperledger Fabric. There are various aspects to consider that affect its transaction processing characteristics. In this section we will evaluate the transactional properties of Hyperledger Fabric from an ACID perspective both at the transaction level and at the system level or block level and also see ways by which the properties can be made stronger.
+
+\subsection{Atomicity}
+Atomicity is a property by which the \glspl{rdbms} guarantees that the transaction will either be committed fully or not committed at all \cite{Atomicity}. In blockchain, atomicity can be evaluated at the individual transaction level and at the block level.
+\subsubsection{Transaction level atomicity}
+Atomicity states that a transaction is either fully committed or not committed at all. In Fabric, a transaction can be either a query or invoke on the chaincode that may modify the world state. Proper number of endorsements on the transaction execution result is required by the endorsing peers specified with the endorsement policy in order for the transaction to be committed to the blockchain. If the endorsement is met, the transaction is sent to the orderer to be included in a block. On the other hand, if a transaction does not meet the endorsement policy specification, it not sent to the orderer.If a transaction fails the \textit{validation system check} and \textit{multiversion system check}, it is marked as invalid but it is not removed from the block and still appended to the blockchain but the world state is not updated. This is different from the permissionless blockchain networks where invalid transactions are not included in the block. Since, the state changes occur only if the transaction is valid, it can be considered as atomic. It is also important to note that if the endorsement criteria is not met, the transaction is not sent to the orderer to be included in the block and the transaction, therefore, does not commit making it \textit{atomic} \cite{HF}.
+
+\subsubsection{Block level atomicity}
+Once the transaction passes the endorsement criteria, it is sent to the ordering service to be included in the block. Blocks contain the transactions that have satisfied the endorsement policy. If, at the \textit{validation phase}, the transaction is deemed as invalid due to a version check failure or validation failure, it is not removed from the block but marked as valid. The generated block will always be committed to the blockchain. This makes the blocks \textit{non-atomic}.
+
+Further work can be done to avoid committing a block in which all the transactions are invalid. This would keep the blockchain short.
+
+\subsubsection{Guarantee of Atomicity}
+There are scenarios in business transactions, where one transaction might be dependent on some other transaction. \textit{Transaction dependencies} should be taken care of so that the transactions execute in the right order. Endorsement policy should be strong enough so that valid transactions are included in the block. In some cases it might happen that a block contains two different transactions that write to the same key in the world state. In this scenario, if the transaction model is not properly implemented only the first transaction will be valid and the second one will be deemed as invalid. Thus strong endorsement policy and \textit{multiversion system checks} and \textit{validation system checks} are required to provide high degree of atomicity.
+
+
+\subsection{Consistency}
+Consistency states that the total asset value before and after a transaction in a system is always the same and it satisfies all the constraints \cite{Atomicity}. In blockchains, consistency can be either \textit{weak}, \textit{eventual}, \textit{strong} or \textit{no consistency} at all depending upon the peer behaviour after transaction execution. As every peer hold the same copy of the ledger, but the update might take time due to geographical location of the peer or due to unavailability, consistency in blockchain can be considered as eventual consistency.
+
+\subsubsection{Ways to make the transactions consistent}
+\begin{itemize}
+    \item \textbf{Removal of non-deterministic behaviour}: Non-determinism in blockchain results in different transaction results on different peers for the same transaction. This is against the basic rule of distributed applications where the same copy is maintained on all the peers. The non-determinism in blockchain can be removed by:
+    \begin{enumerate}
+        \item Using execute-order-validate model removes inconsistent states in the blockchain prior to ordering them in the block and provides high throughput by executing them in parallel \cite{HF}.
+        \item Using a deterministic execution model like Ethereum \cite{evm} and use of a deterministic language like Solidity \cite{sol} that avoids non-determinism in smart contracts.
+        \item Parameters that affect the determinism of smart contract execution should always be passed from the client. For example, timestamp should be generated from the smart contract but passed from the client as every peer will get the same timestamp.
+        \item External API calls should be avoided which may result in non-deterministic execution results \cite{HW2}.
+    \end{enumerate}
+    \item \textbf{Avoid Forking}: \textit{Forking} in blockchain creates two different chains and leads to inconsistent state in the blockchain. This is usually solved by taking the longest chain as the legitimate blockchain. Using execute-order-validate model can remove inconsistent states early and avoids forking. Also avoiding \textit{lottery-based} consensus algorithms can help in avoiding forking in the chain \cite{HW1}.
+\end{itemize}
+
+\subsection{Isolation}
+Isolation ensures that multiple transactions can take place parallely without resulting in an inconsistent state in the database. This is equivalent to the transaction result execution in sequential manner with the advantages of concurrency control. Isolation guarantees that the changes made by a transaction are only visible only after its written to the main memory \cite{Atomicity}.
+
+\subsubsection{Ways to achieve Isolation}
+Transaction dependencies should be taken care to guarantee strong Isolation property. Dependency is created when the execution result of one transaction is dependent on the execution of another transaction. This dependency can be handled by the smart contract as they handle the transaction execution logic. Dependencies can be either \textit{explicit} or \textit{implicit} \cite{HW2}. 
+
+\textbf{Implicit} dependency has to be taken care of by the smart contract and it is very hard to achieve. This can be implemented by using \textit{mempool} of transactions and continuously applying different transactions till the required result is obtained. With \textbf{explicit} dependency, the client application or the user has to specify which transactions occur in which order. In simple words, the user has to wait till one transaction finishes, fetch the result from that transaction and use those results to simulate the dependent transaction \cite{HW2}.
+
+Similarly, \textbf{dependency graph} also affect the order of transaction execution in a block. The dependency graph can be of two types, \textbf{cyclic} or \textbf{acyclic} \cite{HW2}. Consider a cyclic dependency between three transactions \textit{X}, \textit{Y} and \textit{Z} such that \textit{X} depends on \textit{Y}, \textit{Y} depends on \textit{Z} and \textit{Z} depends on \textit{X}. In this cyclic dependency, all the three transactions must be in the same block and design should be done in such a way that \textit{multiversion check} should execute all the transactions \cite{HW2}.
+
+With the acyclic dependency, the transactions can be included in different blocks but care has to be taken about the sequence in which transactions are committed. Explicit references can also allow for parallel execution of non-dependent transactions included in the same block \cite{HW2}.
+
+\subsection{Durability}
+Durability is the property by which the transaction results are kept persistent on the system even if there is a crash or failure. This is achieved by saving the data on a physical memory on the system. In blockchain, the ledger is composed of the immutable blockchain and the constantly updated world state consisting of the key value store with increasing version number \cite{Ledger}. 
+
+The blockchain in the ledger is a file on the peer system and every peer maintains a copy of the blockchain. Since, it is an append only data structure, it makes sense to use files for the blockchain. It consists of blocks that are linked to each other. It is important to note that since the transactions are validated before committing, there is no guarantee that an successfully executed transaction will change the world state but it will be written on the blockchain. This ensures \textit{strong durability} for transactions.
+
+The world state on the other hand consists of keys and their corresponding latest values that are updated regularly. The peer query is run against the world state. The world state can have different implementations ranging from a relational database model, NoSQL database, JSON document. It is important to note here that a successfully executed transaction might fail the \textit{validity checks} and the world state will not be updated. Hence, there is a \textit{weak durability} in this case.
+
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=\textwidth]{dif.png}
+\caption{Differences in transactional properties of permissioned and permissionless blockchains at the transaction level.}.
+\label{fig:dif}
+\end{center}
+\end{figure}
+
+\section{Differences between Permissioned and Permissionless blockchains based on transactional properties}
+The differences in the transactional properties of the two blockchain systems can be evaluated at the transaction level and at the block or system level. The main concept in both the blockchain networks is to have a peer-to-peer transaction processing system and having a distributed ledger that is secure and tamper-proof. Figure \ref{fig:dif} shows a table with differences from a transaction perspective. Permissionless blockchains can be considered as \textit{Sequential}, \textit{Agreed}, \textit{Ledgered} and \textit{Tamper-Resistant} at the transaction level \cite{Salt}. On the other hand, permissioned blockchains can be considered as \textit{Sequential and Conditionally Parallel}, \textit{Agreed and endorsed}, \textit{Ledgered} and \textit{Tamper-proof}. 
+
+On the other hand at the block level, the transaction processing is a bit different. Figure \ref{fig:diff} shows the differences in transactional properties at the block level for the permissionless and permissioned networks. In permissionless networks, the transaction at the block level can be considered as \textit{Symmetric}, \textit{Admin-free}, \textit{Ledgered} and \textit{Time-consensual} \cite{Salt}. On the other hand, for permissioned blockchains \footnote{the reference is Hyperledger Fabric for the permissioned blockchains}, it can be considered as \textit{Asymmetric} due to different roles associated with an identity and access control, \textit{Admin-controlled} due to the presence of MSPs in the network for resource access, \textit{Ledgered} as both the valid and invalid transactions in a block are committed by the peer and \textit{Time-consensual} by defining a time-to-cut transaction by the \glspl{osn} in the network that creates deterministic blocks on all the nodes. This timer starts when a transaction is included in a block and when the timer expires and a block is still not cut, a time-to-cut transaction is broadcast to finish the block creation \cite{HF}.
+
+
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{diff.png}
+\caption{Differences in transactional properties of permissioned and permissionless blockchains at the block level.}.
+\label{fig:diff}
+\end{center}
+\end{figure}
+
+\section{Effect of consensus algorithms on transactional properties}
+Consensus is a process by which the nodes in a blockchain network agree on the order and content of data. The peers in the blockchain network execute a \textit{consensus protocol} to create blocks from transactions, to validate the transactions and building a hash chain over the created blocks \cite{HF}. Therefore consensus is a necessary requirement to achieve \textbf{consistency} in the blockchain networks \cite{HF}.
+
+The \textit{order-execute} architecture with the consensus implementation can lead to inconsistent state due to non-deterministic results \cite{HF}. In Hyperledger Fabric, the \textit{ordering phase} involves the use of consensus protocols for ordering the transactions in blocks \cite{HF}. Consensus also affects the \textbf{atomicity} of transactions specifying either a transaction execution result is valid or not. Only after the peers reach consensus on a transaction or block, it is considered valid and appended to the ledger by updating the world state. A strong consensus protocol can guarantee atomicity of transactions. 
+
+\section{Effect of channels on transactional properties}
+The concept of channels in Hyperldger Fabric provided confidentiality and privacy to the peers of the channel \cite{Channels}. However, since a business transaction can span different channels and be composed of many \textit{nested transactions} that are scattered over different channels, it is important to consider the impact of channels on transaction execution.
+
+Having a channel is like creating a private blockchain network within a larger blockchain network. It can also be said that a blockchain network in Hyperledger Fabric is composed of several smaller channels. A peer can be on more than one channel but it maintains a separate ledger for the different channels. For example, if a peer \textit{P} is present on channel \textit{A} and channel \textit{B}, it will have two different ledgers \textit{L1} for channel \textit{A} and \textit{L2} for channel \textit{B}.
+
+As the main purpose of channels is to isolate data, it becomes problem when a large business transaction involves sub-transactions from different channels. Consider that a chaincode call on one channel requires data from a chaincode call on a different channel (same chaincodes are installed on both the channels but their states are different). In this scenario, if the first transaction fails, the second transaction will not fail automatically and requires a layer of implementation on the top that handles this logic. Without proper implementation, the large transaction will be considered \textbf{non-atomic} and may result in \textbf{inconsistent state}. There are different ways to make the transactions consistent and atomic as:
+\begin{enumerate}
+    \item Use channels only when the data is not going to be used in different channels at all.
+    \item Use of a single channel and private data collection to provide privacy for only the data that is sensitive and cannot be shared with other peers on the channel.
+    \item Use of single channel with data encryption.
+    \item Use of multiple channels with an intermediate implementation of a software layer like a 2-P transaction monitor on the application side that has access to all the channel's data and manages the dependent transactions. This layer has to take care of \textbf{rollback}, \textbf{compensation action} and \textbf{commit} for all the transactions. However, this type of implementation will make the network slow.
+\end{enumerate}
+
+\section{Effect of chaincodes on transactional properties}
+Chaincodes contain the application logic for the entire blockchain network and for a peer to access the world state and ledger the chaincode has to be installed on the corresponding peer \cite{Chaincode}. A business transaction may span different chaincodes on same channel or on different channel. Proper transaction management has to be taken care of in such a scenario.
+
+Chaincodes affect the \textbf{consistency} \textbf{isolation} and \textbf{atomicity} properties of a transaction and requires special effort on the side of the application developer to program the chaincodes in such a way that these properties can be guaranteed. Chaincode operations can be either \textbf{reads} or \textbf{writes}. This is also impacted by the introduction of a number of channels. Let us consider the different scenarios involving chaincode to chaincode call:
+\begin{enumerate}
+    \item \textbf{Same channel read operation}: It is possible to call a chaincode from another chaincode on the same channel to read the world state. This will be included in a single transaction and will respect the atomicity guarantee.
+    \item \textbf{Different channel read operation}: Reads from a chaincode on a different channel are also possible. However, there is no MVCC check of the read value and the caller has to maintain the state in its own transaction context. If the caller has no access to the callee channel, the read will fail.
+    \item \textbf{Same channel write operation}: The called chaincode has its own individual read write sets within the caller's transaction context. Therefor, committing this transaction will involve multiple chaincode's read-write sets on a single MVCC check.If there exists any key-version check failure from any involved chaincodes, the whole transaction will fail. This provides \textbf{atomicity} and \textbf{consistency} to the transactions \cite{jira}.
+    \item \textbf{Different channel write operation}: The same transaction context cannot be used when different channels are involved. There are different ledgers involved with different key sets. In order to atomically co-ordinate the sub-transactions, the caller has to create an intermediate implementation like a 2-P commit that handles all the sub-transactions in a single transaction context \cite{jira}.
+\end{enumerate}
+
+\section{Effect of endorsement policy on transactional properties}
+Endorsement policies are defined at the time of instantiation of chaincode on a channel. A strong endorsement policy will guarantee \textbf{consistency} and \textbf{atomicity} of transactions. For example, if there are two organizations \textit{Org1} and \textit{Org2}, endorsement policy should be such that involves agreement on execution results from both the organizations. This can be achieved by using the policy \textit{AND(Org1.member, Org2.member)}. This will force the client to collect endorsements from both the organizations. The endorsement will be valid if and only if the peers sign the same bytes which will be different if the transaction results are different and will be easily caught. Thus a strong endorsement policy guarantees \textbf{consistency} and \textbf{atomicity} in the network.
+
+\section{Other miscellaneous transaction terms}
+In this section we will see some of the ACID transaction concepts in relation to the blockchain transactions and how they can be implemented.
+
+\subsection{Peer transaction manager}
+The traditional \glspl{rdbms} have a \textit{resource manager} that is responsible for affecting the state changes in the databases to maintain data consistency. In Hyperledger Fabric, the world state is maintained and managed by the \gls{ptm} \cite{HF}. The \gls{ptm} has a key-value store to manage the latest state in the form as (\textit{key, value, ver}) for every unique key of the chaincode state. The \textit{ver} in the store provides information about the sequence number of the block and also the transaction sequence number in the block. The version is unique and increases every time there is a state change \cite{HF}.
+
+When a transaction is executed, its \textit{readset} in the form (key, ver) and writeset in the form (key, value) is maintained by the \gls{ptm}. The PTM also supports rich range queries by computing a hash of the query execution results and then adding the query string and hash in the \textit{readset} \cite{HF}.
+
+The PTM also perform the validation phase to ensure consistency of data in the ledger. The validation of transactions is done sequentially in a block by comparing the version in the readset for a key to the latest version present in the blockchain. If the version differs, the PTM aborts the update of world state by marking the transaction as invalid. To avoid phantom reads for range queries, PTM executes the query again and compares the new hash with the one present in readset. In case of successful transactions, the PTM updates the latest state with the \textit{writeset} that it has \cite{HF}. Thus, PTM has the responsibility to maintain the integrity and consistency of transactions on all the peers respectively.
+
+\subsection{Savepoint}
+Savepoint is a way of defining labels or markers in a transaction so that if a failure occur, the transaction can be resumed from these labels \cite{sp}. It is a way of dividing a large complex transaction into smaller manageable transactions. In Hyperledger Fabric Ledger, the PTM is responsible for managing the \textit{savepoint} for the blockchain \cite{HF}. After the PTM validates the transactions and applies the state changes, it calculates the savepoint value that defines the largest successfully committed block number in the ledger \cite{HF}. This savepoint is very useful in times of crashes when the world state and the indices have to be recovered from the persisted blocks in the ledger \cite{HF}.
+
+\subsection{Rollback transactions in Hyperledger Fabric}
+Rollback is the process by which the transaction effects are undone in the context of transaction execution. As stated before, the blockchain is an append only data structure and the world state contains the latest value for a key. It is always possible to generate a world state from the blockchain with the help of \textit{savepoint} in case of crashes and with the help of mutual consensus in case the world state has to be regenerated for all the peers. However, rollback will not decrease the version number for a key in the world state and it will only increase with the rollback transaction.
+
+\subsection{Compensating transactions}
+In \gls{rdbms}, a compensating transaction is used when the transaction results are committed and have to be undone with a new transaction that overwrites it to the previous value or to some predefined required value. As discussed before, the ledger contains an append-only blockchain data structure and to create a compensation action a new transaction has to be submitted. This transaction will also be recorded in the blockchain and the world state can be updated with the required value.
+
+
+\chapter{Concept, Specification and Design}
 \label{chap:cs}
+\section{System Overview}
+\section{System Architecture}
+\section{Data Model}
+\section{User Roles}
+\section{Use Cases}
+\section{Web front-end application}
+\section{Android application}
+\section{Chaincode functions}
 
 
-\chapter{Design}
+\chapter{Experimental Design and Results}
 \label{chap:de}
+\section{Experiment 1: Chaincode to chaincode call on same channel}
+\subsection{Read from same channel}
+\subsection{Write from same channel}
+\subsection{Experimental Results}
 
+\section{Experiment 2: Chaincode to chaincode call on different channels}
+\subsection{Read from different channels}
+\subsection{Write from same channel}
+\subsection{Experimental Results}
 
-\chapter{Implementation and Validation}
-\label{chap:iv}
+\section{Experiment 3: Implementation of a 2-P transaction monitor at the application level}
+\subsection{Creating rollback transaction}
+\subsection{Creating compensation action}
+\subsection{Experimental Results}
 
+\section{Experiment 4: Test for immutability of ledger}
+\subsection{Modifying the world state}
+\subsection{Modifying the peer blockchain}
+\subsection{Modifying the orderer blockchain}
+\subsection{Adding a new peer after tampering blockchain}
+\subsection{Experimental Results}
 
 \chapter{Conclusion and Future Work}
 \label{chap:cf}
+\section*{Future Work}
 
 %\blinddocument
 
