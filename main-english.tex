@@ -28,6 +28,9 @@
 \input{config}
 
 \addbibresource{bibliography.bib}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{listings-golang}
 \usepackage[
   title={Evaluating Various Transaction Processing
 Characteristics of Permissioned Blockchain Networks},
@@ -42,8 +45,20 @@ Characteristics of Permissioned Blockchain Networks},
 ]{scientific-thesis-cover}
 \input{acronyms}
 
+\definecolor{dkgreen}{rgb}{0.5,0.5,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{
+    basicstyle=\footnotesize,
+    keywordstyle=\color{red},
+    stringstyle=\color{blue},
+    commentstyle=\color{OliveGreen},
+    language=Golang
+}
+
 \makeindex
-\setcounter{tocdepth}{3}
+\setcounter{tocdepth}{2}
 \begin{document}
 
 %tex4ht-Konvertierung verschönern
@@ -136,11 +151,11 @@ Hyperledger Fabric and evaluate them by comparing them to the ACID properties of
 
 %mittels \newfloat wurde die Algorithmus-Gleitumgebung definiert.
 %Mit folgendem Befehl werden alle floats dieses Typs ausgegeben
-\ifdeutsch
-  \listof{Algorithmus}{Verzeichnis der Algorithmen}
-\else
-  \listof{Algorithmus}{List of Algorithms}
-\fi
+%\ifdeutsch
+  %\listof{Algorithmus}{Verzeichnis der Algorithmen}
+%\else
+  %\listof{Algorithmus}{List of Algorithms}
+%\fi
 %\listofalgorithms %Ist nur für Algorithmen, die mittels \begin{algorithm} umschlossen werden, nötig
 
 % Abkürzungsverzeichnis
@@ -243,7 +258,7 @@ The remaining content of the document is arranged as follows:
 
 \textbf{Chapter \ref{chap:tc} - \nameref{chap:tc}} : This chapter will highlight the differences in the transaction processing characteristics of permissioned blockchains by comparing it with the properties of \glspl{rdbms}.
 
-\textbf{Chapter \ref{chap:cs} - \nameref{chap:cs}} : In this chapter we will discuss the detailed functional and non-functional requirements and the system to be developed and the developed use case for the experiments.
+\textbf{Chapter \ref{chap:cs} - \nameref{chap:cs}} : In this chapter we will discuss the steps required to create a permissioned blockchain network and how a blockchain network can be used with web and mobile application.
 
 \textbf{Chapter \ref{chap:de} - \nameref{chap:de}} : In this chapter we will define different experiments performed to understand the transaction characteristics of permissioned blockchains and their corresponding results.
 
@@ -527,13 +542,13 @@ Androulaki et. al. describe the working of Fabric and its underlying architectur
 The study in this paper highlights the difference between the order-execute architecture model used in permissionless blockchains and early permissioned blockchains and the execute-order-validate architecture model of Hyperledger Fabric. For the purpose of study, a authority minted cryptocurrency similar to that of Bitcoin is used which is defined as \textit{Fabcoin} in the paper \cite{HF}. The study is focussed on the customization of the validation phase and the endorsement policy. The developed model is used for benchmarking of permissioned blockchains.
 
 \section{Blockchain Consensus Protocols in the Wild}
-Cachin and Vukoli´c \cite{Con} wrote a paper on the different consensus models for blockchain that include crash tolerant and byzantine tolerant models.
+Cachin and Vukoli\'c \cite{Con} wrote a paper on the different consensus models for blockchain that include crash tolerant and byzantine tolerant models.
 
 \subsection{Motivation}
 Blockchain transactions are based on consensus mechanism and it is essential to have an efficient consensus algorithm so that the transactions are secure and resilient. The main aim of consensus is to agree on the data and the order in which the transactions are executed. There are chances that a particular blockchain network can have adversarial nodes in the system and hence, a blockchain system should be able to tolerate Byzantine faults. 
 
 \subsection{Study Approach}
-Cachin and Vukoli´c review the different consensus protocols in some prominent permissioned blockchain platforms and analyze their fault models and resilience against attacks. The protocol comparison covers Hyperledger Fabric, Tendermint, Symbiont, Iroha, Kadena, Chain,  Ripple, Stellar, and others \cite{Con}. Figure \ref{fig:conT} shows the consensus resilience properties in different blockchains.
+Cachin and Vukoli\'c review the different consensus protocols in some prominent permissioned blockchain platforms and analyze their fault models and resilience against attacks. The protocol comparison covers Hyperledger Fabric, Tendermint, Symbiont, Iroha, Kadena, Chain,  Ripple, Stellar, and others \cite{Con}. Figure \ref{fig:conT} shows the consensus resilience properties in different blockchains.
 
 \begin{figure}[h!]
 \begin{center}
@@ -681,7 +696,7 @@ Once the transaction passes the endorsement criteria, it is sent to the ordering
 Further work can be done to avoid committing a block in which all the transactions are invalid. This would keep the blockchain short.
 
 \subsubsection{Guarantee of Atomicity}
-There are scenarios in business transactions, where one transaction might be dependent on some other transaction. \textit{Transaction dependencies} should be taken care of so that the transactions execute in the right order. Endorsement policy should be strong enough so that valid transactions are included in the block. In some cases it might happen that a block contains two different transactions that write to the same key in the world state. In this scenario, if the transaction model is not properly implemented only the first transaction will be valid and the second one will be deemed as invalid. Thus strong endorsement policy and \textit{multiversion system checks} and \textit{validation system checks} are required to provide high degree of atomicity.
+There are scenarios in business transactions, where one transaction might be dependent on some other transaction. \textit{Transaction dependencies} should be taken care of so that the transactions execute in the right order. Endorsement policy should be strong enough so that valid transactions are included in the block. In some cases it might happen that a block contains two different transactions that write to the same key in the world state. In this scenario, if the transaction model is not properly implemented only the first transaction will be valid and the second one will be deemed as invalid. Thus strong endorsement policy and \textit{multiversion concurrency checks} and \textit{validation system checks} are required to provide high degree of atomicity.
 
 
 \subsection{Consistency}
@@ -793,43 +808,876 @@ Rollback is the process by which the transaction effects are undone in the conte
 In \gls{rdbms}, a compensating transaction is used when the transaction results are committed and have to be undone with a new transaction that overwrites it to the previous value or to some predefined required value. As discussed before, the ledger contains an append-only blockchain data structure and to create a compensation action a new transaction has to be submitted. This transaction will also be recorded in the blockchain and the world state can be updated with the required value.
 
 
-\chapter{Concept, Specification and Design}
+\chapter{Concept, Specification and Design of a permissioned blockchain network}
 \label{chap:cs}
-\section{System Overview}
-\section{System Architecture}
-\section{Data Model}
-\section{User Roles}
-\section{Use Cases}
-\section{Web front-end application}
-\section{Android application}
-\section{Chaincode functions}
+In this chapter, we will create a blockchain network that works with a web application and an Android application. We will see the creation of different artifacts like the chaincodes, channels, endorsement policy, MSP, ledger, peer and client web applications and android applications that work with this blockchain network. Some of the experiments in Chapter \ref{chap:de} are based on the extension of this application. 
 
+\section{System Overview}
+We will create a simple supply chain application using Hyperledger Fabric that will help us to understand the transaction processing functions in permissioned blockchains. As a product passes hands through different parties in a supply chain, traceability of product regarding its authenticity and quality becomes troublesome and time-consuming. With the help of a blockchain application, all the interested parties are included in a single network and every participant maintains a copy of data. As a result, traceability becomes fast and it also provides transparency in the whole network. Moreover, it provides a trust environment for business transactions that was hitherto managed by third parties like banks.
+
+The supply chain application can be used to trace any product from source to destination. For simplicity, we will not categorize the products and consider it as a general food product. The products, however, can be identified through their product id as we will show in our Android application. The supply chain involves participants like \textbf{supplier}, \textbf{producer}, \textbf{buyer} and \textbf{consumer} that we will depict in the application. The functions on a product will include \textit{query a product with its id}, \textit{query all the products}, \textit{update a product with the new owner} and \textit{create a new owner}. The different functions will be based upon the type of user permissions granted for the participant. For example, a supplier will have the permission to update the owner, a producer will have the permission to view all products, create a new product, view a product by its id, a buyer will have query permissions, update privileges whereas a consumer will have the permission to query a product with its id to trace the product.
+
+Initially, we will create a single channel for the supply chain and for the experimentation we will further extend it by creating multiple channels and simulating a 2-PC transaction monitor. The Android application is useful for the \textbf{consumer} who can scan a product's QR code and get the information about the product.
+
+\begin{figure}[h!]
+\advance\leftskip-2cm
+
+\includegraphics[width=20cm,height=20cm,keepaspectratio]{architecture.pdf}
+\caption{Figure showing the architecture of the developed application. Methods marked with (*) will not be accessible to the corresponding users. The method  $getPrice()\textsuperscript{1}$ will fetch price for channel between Producer and Supplier, $getPrice()\textsuperscript{3}$ will fetch price for channel betwwen Supplier and Buyer, $getPrice()\textsuperscript{2}$ will fetch prices for both the channels, $getPrice()\textsuperscript{4}$ will fetch price for channel between buyer and consumer}.
+\label{fig:arch}
+
+\end{figure}
+
+\section{System Architecture}
+The participants of a blockchain network will be accessing the blockchain network from a web application interface and a mobile application. As shown in Figure \ref{fig:arch}, the different peers are associated with different participants of the network. This ensures that only the authorized peers can access the functions of the chaincode and can submit transaction on the blockchain network. Initially for the application, we created a single channel where all the participants are included in the channel and the use case is further extended with the experimentation in the next chapter where we use multiple channels. 
+
+Depending upon the login credentials, the user identity is mapped to the login details and the peer and the view related to the user's permissions is shown on the screen. For example, the user \textbf{producer} will have access to three functions that include getting all the products details, get product detail by id and create a new product. The view for \textbf{producer} will only show these functions and it will be handled programatically. Additionally, there is an android application created that can be used to get a product by id, get a product by scanning QR-Code. Also the app can be used by different users like \textbf{producer}, \textbf{supplier}, \textbf{buyer} to perform the associated functions.
+
+As it is seen in Figure \ref{fig:arch}, the peer for the \textbf{producer} will have two chaincodes installed on it. The \textbf{productChaincode} contains all the functions related to the products like querying, updating and creating a new product. However, the producer has no access to the \textbf{updateProduct} method of the chaincode. Similarly, supplier and buyer has no access to \textbf{createProduct}, consumer has no access to \textbf{getAllProducts}, \textbf{createProduct} and \textbf{updateProduct}. The chaincodes maintain their own state and the \textbf{priceChaincode} will have its own state containing price information. Both the chaincodes maintain their separate ledger that is distributed over the network. 
+
+There are three \footnote{the fourth channel for price between buyer and consumer is not created} different channels created in the application, one channel between the producer and supplier for the agreed price, one channel between the supplier and buyer for the agreed price and one channel for the product functions. In short there are two channels for price and one channel for the product processing functions.  
+
+
+\section{User Roles}
+The blockchain application will have four different type of participants with each participant having its own functions in the blockchain application. Figure \ref{fig:actors} shows the different actors in the developed blockchain application. The description of the participants is as follows:
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{actors.png}
+\caption{Figure showing different participants in the blockchain application.}
+\label{fig:actors}
+\end{center}
+\end{figure}
+
+\begin{figure}[b!]
+\begin{center}
+\includegraphics[width=\textwidth]{uml.pdf}
+\caption{Use case diagram for the different participants. The first figure shows the use case diagram for producer, second figure shows the use case diagram for supplier, third figure for the buyer and fourth figure for the consumer.}
+\label{fig:uml}
+\end{center}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Producer}: The producer of product can be any manufacturer that creates products from finished goods. For example, a farmer who produces wheat in the field or a company that manufactures biscuits. The different functions associated with the producer are as follows:
+    \begin{enumerate}
+        \item \textbf{getAllProduct()}: Fetches the details about all the products.
+        \item \textbf{getProductById()}: Fetches the details of a specific product identified by its id.
+        \item \textbf{createProduct()}: Creates a new product with all the necessary and required fields.
+    \end{enumerate}
+    \item \textbf{Supplier}: The supplier is the link between the producer and buyer and plays an important role in the supply chain application. The supplier can be an organization or a company that delivers raw or finished goods to a buyer. The different functions associated with the supplier are as follows:
+    \begin{enumerate}
+        \item \textbf{getAllProduct()}: Fetches the details about all the products.
+        \item \textbf{getProductById()}: Fetches the details of a specific product identified by its id.
+        \item \textbf{updateProduct()}: Updates the owner of the product as it moves in the supply chain.
+    \end{enumerate}
+    \item \textbf{Buyer}: A buyer is the one who gets the product produced by the producer and can further process it or sell it the way its delivered. The buyer can be a supermarket store, vehicle manufacturer or other such manufacturing units. The different functions associated with the buyer are as follows:
+    \begin{enumerate}
+        \item \textbf{getAllProduct()}: Fetches the details about all the products.
+        \item \textbf{getProductById()}: Fetches the details of a specific product identified by its id.
+        \item \textbf{updateProduct()}: Updates the owner of the product as it moves in the supply chain.
+    \end{enumerate}
+    \item \textbf{Consumer}: The consumer is the last point in the supply chain and is the one who enjoys the services of the final finished good after purchasing it from the manufacturer or from a supermarket. The different functions associated with the consumer are as follows:
+    \begin{enumerate}
+        \item \textbf{getProductById()}: Fetches the details about a particular product specified with the Id.
+    \end{enumerate}
+\end{itemize}
+
+
+
+\section{Use Cases}
+As discussed before, there are four different participants in the network where each participant has a specific set of functions. The use case diagram helps to understand the different functions \footnote{The function \textit{getPrice()} is associated with the Product and is called as a promise function after the product response in the corresponding channel} a participant can perform and the constraints and possible outcomes are also discussed. Figure \ref{fig:uml} shows the different participants in the network and their functions with the help of a use-case diagram.
+
+The details about the different use-cases is described further: 
+
+
+\begin{table}[h!]
+\begin{center}
+    \begin{tabular}{ | l | p{9cm} |}
+    \hline
+    \textbf{Name} & \textbf{Get all Products} \\ \hline
+    Goal & Get all the details about all the products on the blockchain network. \\ \hline
+    Actor & Producer, Supplier, Buyer \\ \hline
+    Pre-condition & The logged user should have proper authorization to perform the function. \\ \hline
+    Post-condition & The details about the product like owner, location, datetime and product Id are shown in a table. \\ \hline
+    Post-condition in Special Case & The user is not authorized to perform the action and hence, no results are shown.\\ \hline
+    Normal Case & \begin{itemize}
+        \item The user clicks on the button that fetches all the products.
+        \item A chaincode query is executed against the world state on the local peer and response is returned in a json format.
+        \item The response from the blockchain is handled by the front-end application that parses the data and shows it in a tabular format.
+    \end{itemize}\\ \hline
+    Special Cases & Request to get the product details failed because the user now is no longer a part of the network or its membership has been revoked. \\ \hline
+    \end{tabular}
+\end{center}
+\caption{Description for the use case \textit{Get all Products} for the participants \textit{Producer}, \textit{Supplier}, \textit{Buyer}.}
+    \label{tab:uc1}
+\end{table}
+
+\begin{table}[t!]
+\begin{center}
+    \begin{tabular}{ | l | p{9cm} |}
+    \hline
+    \textbf{Name} & \textbf{Get Product by Id} \\ \hline
+    Goal & Get all the details about a product by querying it with its Id on the blockchain network. \\ \hline
+    Actor & Producer, Supplier, Buyer, Consumer \\ \hline
+    Pre-condition & The logged user should have proper authorization to perform the function. \\ \hline
+    Post-condition & The details about the product, specified with the Id, like owner, location, datetime and product Id are shown in a table. \\ \hline
+    Post-condition in Special Case & \begin{itemize}
+        \item The user is not authorized to perform the action and hence, no results are shown.
+        \item The product with the specified Id does not exist in the blockchain network.
+    \end{itemize}\\ \hline
+    Normal Case & \begin{itemize}
+        \item The user enter the Product Id and clicks on the button that the details about a specific product.
+        \item A chaincode query is executed against the world state on the local peer and response is returned in a json format.
+        \item The response from the blockchain is handled by the front-end application that parses the data and shows it in a tabular format.
+    \end{itemize}\\ \hline
+    Special Cases & \begin{itemize}
+        \item Request to get the product details failed because the user now is no longer a part of the network or its membership has been revoked.
+        \item No response returned as the product with the specified Id is not there in the network.
+    \end{itemize} \\ \hline
+    \end{tabular}
+\end{center}
+\caption{Description for the use case \textit{Get Product by Id} for the participant \textit{Producer}, \textit{Buyer}, \textit{Supplier}, \textit{Consumer}.}
+    \label{tab:uc2}
+\end{table}
+
+\begin{table}[t!]
+\begin{center}
+    \begin{tabular}{ | l | p{9cm} |}
+    \hline
+    \textbf{Name} & \textbf{Create a Product} \\ \hline
+    Goal & Create a new product in the blockchain network by providing all the details. \\ \hline
+    Actor & Producer \\ \hline
+    Pre-condition & The logged user should have proper authorization to perform the function. \\ \hline
+    Post-condition & A new product with the supplied values for owner, location, datetime and product Id fields is created. \\ \hline
+    Post-condition in Special Case & The user is not authorized to perform the action and hence, transaction fails.\\ \hline
+    Normal Case & \begin{itemize}
+        \item The user enter product Id, owner, location, datetime for the product.
+        \item A chaincode invoke transaction is executed on the peer and the results after validation are submitted to all the peers and transaction is committed.
+        \item The response from the blockchain contains the transaction Id of the transaction and it is displayed on the web and mobile application.
+    \end{itemize} \\ \hline
+    Special Cases & \begin{itemize}
+        \item Request to get the product details failed because the user now is no longer a part of the network or its membership has been revoked.
+        \item The ordering service is down and as a result the transaction cannot be put in blocks and cannot be committed. Transactions failure notification is shown in the application.
+    \end{itemize}\\ \hline
+    \end{tabular}
+\end{center}
+\caption{Description for the use case \textit{Create a Product} for the participant \textit{Producer}.}
+    \label{tab:uc3}
+\end{table}
+
+\begin{table}[t!]
+\begin{center}
+    \begin{tabular}{ | l | p{9cm} |}
+    \hline
+    \textbf{Name} & \textbf{Update a Product} \\ \hline
+    Goal & Update the \textbf{Owner} field of the product as it flows through the supply chain. \\ \hline
+    Actor & Supplier, Buyer \\ \hline
+    Pre-condition & The logged user should have proper authorization to perform the function. \\ \hline
+    Post-condition & The product is updated with the new owner and result can be verified by quering. \\ \hline
+    Post-condition in Special Case & \begin{itemize}
+        \item The user is not authorized to perform the action and hence, transaction fails.
+        \item The Product with specified Id does not exist resulting in error.
+    \end{itemize}\\ \hline
+    Normal Case & \begin{itemize}
+        \item The user enter the Product Id and owner for which the update is required.
+        \item A chaincode invoke transaction is executed on the peer and the transaction is sent to the ordering service. The ordering service puts the transaction in a block and broadcasts it to all peers that eventually commit it.
+        \item The response contains the transaction Id of the invoke transaction and acknowledgement about transaction status that is shown in the application.
+    \end{itemize}\\ \hline
+    Special Cases & \begin{itemize}
+        \item Request to get the product details failed because the user now is no longer a part of the network or its membership has been revoked.
+        \item The ordering service is down and as a result the transaction cannot be put in blocks and cannot be committed. Transactions failure notification is shown in the application.
+    \end{itemize}\\ \hline
+    \end{tabular}
+\end{center}
+\caption{Description for the use case \textit{Update a Product} for the participant \textit{Buyer}, \textit{Supplier}.}
+    \label{tab:uc4}
+\end{table}
+\clearpage
+\section{Data Model}
+The data model defines the schema of the data that is going to be used in the application. The product has information like \textbf{ProductId}, \textbf{Location}, \textbf{Owner}, \textbf{Datetime} which is maintained in a separate ledger called \textbf{productLedger} on every peer. Similarly, the Price schema defines the information required to get a product's price. It has fields like \textbf{ProductId} and \textbf{Price}. The Price schema is maintained by the priceLedger on every peer. Figure \ref{fig:dm} shows the data model for the application developed.
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{dataModel.png}
+\caption{Figure showing the schema of product and price that are maintained in two different ledgers.}
+\label{fig:dm}
+\end{center}
+\end{figure}
+The importance of the various properties can be explained as:
+\begin{enumerate}
+    \item \textbf{ProductId}: Every product is unique and therefore, ProductId is the primary key for the product that can be used to query a product.
+    \item \textbf{Location}: The Location property defines the current location of the product in the supply chain. The location field is composed of latitude and longitudes for exact geographical location.
+    \item \textbf{Owner}: The Owner fields defines the current owner of the product in the supply chain. This helps to understand the flow of product through different people and can be used for traceability and quality analysis.
+    \item \textbf{Datetime}: This field defines the processing time of the product at that specific location with the owner mentioned in the Owner field.
+    \item \textbf{Price}: This field shows the price of the product. The Price is fetched from different channels and one product may have different prices as it is on different channels.
+\end{enumerate}
+All these properties help in properly understanding the flow of products in supply chain as the product moves and reaches to the end user. It helps in traceability, quality analysis, dispute resolution and creation of trust environment between the participants.
+
+\section{Chaincode functions}
+Chaincode contain the actual business logic for the blockchain network. It deals with the transaction execution on the peer on which it is attached and the results are then sent to all the peer for committing so that every peer maintains a shared copy of the same data. There are two types of chaincode methods:
+\begin{itemize}
+    \item \textbf{Init} method: The Init method is called whenever the chaincode is instantiated or upgraded on a channel \cite{Chaincode}. The initialization is accompanied with initialization of the world state by creating keys and their corresponding values.
+    \item \textbf{Invoke} method: The Invoke method is called whenever an invoke transaction is explicitly specified on the peer. In other words, Invoke method creates a transaction proposal on the peer on which it is executed.
+\end{itemize}
+Let us examine the different chaincode methods \cite{cm} developed in the application.
+
+\begin{Listing}[b!]
+\begin{lstlisting}
+// product-chaincode.go
+/*
+ This code is based on code written by the Hyperledger Fabric community.
+ Original code can be found here: https://github.com/hyperledger/fabric-samples/blob/release/chaincode/fabcar/fabcar.go
+*/
+
+/*
+ * The Invoke method *
+ called when an application requests to run the chaincode "product-chaincode"
+ The app also specifies the specific chaincode function to call with args
+*/
+func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response {
+
+	// Retrieve the requested chaincode function and arguments
+	function, args := APIstub.GetFunctionAndParameters()
+	// Route to the appropriate handler function to interact with the ledger
+	if function == "queryProduct" {
+		return s.queryProduct(APIstub, args)
+	} else if function == "initLedger" {
+		return s.initLedger(APIstub)
+	} else if function == "createProduct" {
+		return s.createProduct(APIstub, args)
+	} else if function == "queryAllProducts" {
+		return s.queryAllProducts(APIstub)
+	} else if function == "changeProductOwner" {
+		return s.changeProductOwner(APIstub, args)
+	}
+
+	return shim.Error("Invalid chaincode function name.")
+}
+\end{lstlisting}
+\caption{Code snippet for the Invoke method in the product-chaincode.go}
+\label{lst:invoke}
+\end{Listing}
+
+%Listing \ref{lst:invoke} shows the Invoke method of the product-chaincode file. The peer can call this method on the installed chaincode\footnote{For a peer to invoke any method the chaincode must be installed on that peer.} and can specify which function has to be called with the required parameters in \textbf{Args} parameter specified in the cli command.
+
+\begin{Listing}[h!]
+\begin{lstlisting}
+/*
+ * The queryProduct method *
+Used to view the records of one particular product
+It takes one argument -- the productId for the product to be searched
+*/
+func (s *SmartContract) queryProduct(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1")
+	}
+
+	productAsBytes, _ := APIstub.GetState(args[0])
+	if productAsBytes == nil {
+		return shim.Error("Could not locate product")
+	}
+	return shim.Success(productAsBytes)
+}
+\end{lstlisting}
+\caption{Code snippet for the \textit{queryProduct} method in the product-chaincode.go}
+\label{lst:queryPId}
+\end{Listing}
+%Listing \ref{lst:queryPId} shows the chaincode function that fetches a product based upon the product Id entered by the user. The function requires a parameter for the key that it searches in the world state and returns the latest value.
+\begin{Listing}[h!]
+\begin{lstlisting}
+/*
+ * The createProduct method *
+This method will be used by the Producer to create a record of a new product that becomes part of the supply chain.
+*/
+func (s *SmartContract) createProduct(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 5 {
+		return shim.Error("Incorrect number of arguments. Expecting 5")
+	}
+
+	var product = Product{Price: args[1], Location: args[2], Timestamp: args[3], Owner: args[4]}
+
+	productAsBytes, _ := json.Marshal(product)
+	err := APIstub.PutState(args[0], productAsBytes)
+	if err != nil {
+		return shim.Error(fmt.Sprintf("Failed to record product: %s", args[0]))
+	}
+
+	return shim.Success(nil)
+}
+\end{lstlisting}
+\caption{Code snippet for the \textit{createProduct} method in the product-chaincode.go}
+\label{lst:create}
+\end{Listing}
+
+\begin{Listing}[h!]
+\begin{lstlisting}
+/*
+ * The queryAllProducts method *
+allows for assessing all the records added to the ledger(all the products in the ledger)
+This method will return an array of JSON response that can be parsed by the front-end applications to show the results.
+*/
+func (s *SmartContract) queryAllProducts(APIstub shim.ChaincodeStubInterface) sc.Response {
+
+	startKey := "0"
+	endKey := "999"
+
+	resultsIterator, err := APIstub.GetStateByRange(startKey, endKey)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	defer resultsIterator.Close()
+
+	// buffer is a JSON array containing QueryResults
+	var buffer bytes.Buffer
+	buffer.WriteString("[")
+
+	bArrayMemberAlreadyWritten := false
+	for resultsIterator.HasNext() {
+		queryResponse, err := resultsIterator.Next()
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		// Add comma before array members,suppress it for the first array member
+		if bArrayMemberAlreadyWritten == true {
+			buffer.WriteString(",")
+		}
+		buffer.WriteString("{\"Key\":")
+		buffer.WriteString("\"")
+		buffer.WriteString(queryResponse.Key)
+		buffer.WriteString("\"")
+
+		buffer.WriteString(", \"Record\":")
+		// Record is a JSON object, so we write as-is
+		buffer.WriteString(string(queryResponse.Value))
+		buffer.WriteString("}")
+		bArrayMemberAlreadyWritten = true
+	}
+	buffer.WriteString("]")
+
+	fmt.Printf("- queryAllProducts:\n%s\n", buffer.String())
+
+	return shim.Success(buffer.Bytes())
+}
+\end{lstlisting}
+\caption{Code snippet for the \textit{queryAllProducts} method in the product-chaincode.go}
+\label{lst:query}
+\end{Listing}
+
+\begin{Listing}[h!]
+\begin{lstlisting}
+/*
+ * The changeProductOwner method *
+The data in the world state can be updated with currently has the product.
+This function takes in 2 arguments, product id and new owner name.
+*/
+func (s *SmartContract) changeProductOwner(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+
+	if len(args) != 2 {
+		return shim.Error("Incorrect number of arguments. Expecting 2")
+	}
+
+	productAsBytes, _ := APIstub.GetState(args[0])
+	if productAsBytes == nil {
+		return shim.Error("Could not locate product")
+	}
+	product := Product{}
+
+	json.Unmarshal(productAsBytes, &product)
+	// Normally check that the specified argument is a valid owner of the product
+	// we are skipping this check for this example
+	product.Owner = args[1]
+
+	productAsBytes, _ = json.Marshal(product)
+	err := APIstub.PutState(args[0], productAsBytes)
+	if err != nil {
+		return shim.Error(fmt.Sprintf("Failed to change product owner: %s", args[0]))
+	}
+
+	return shim.Success(nil)
+}
+\end{lstlisting}
+\caption{Code snippet for the \textit{changeProductOwner} method in the product-chaincode.go}
+\label{lst:update}
+\end{Listing}
+\begin{Listing}[h!]
+\begin{lstlisting}
+/*
+ * main function *
+calls the Start function
+The main function starts the chaincode in the container during instantiation.
+*/
+func main() {
+
+	// Create a new Smart Contract
+	err := shim.Start(new(SmartContract))
+	if err != nil {
+		fmt.Printf("Error creating new Smart Contract: %s", err)
+	}
+}
+\end{lstlisting}
+\caption{Code snippet for the \textit{main} method in the product-chaincode.go}
+\label{lst:main}
+\end{Listing}
+
+\section{Web front-end application}
+In this section, we will see the structure and flow of different actions that a user can perform with the front-end application. The user is authenticated with the login credentials and depending upon the type of user, different actions are performed by the user. The application uses the Hyperledger Fabric Client SDK to interact with the blockchain ledger.
+
+\subsection{Get All Products}
+Here we will see the front-end application part where we get all the details about all the products. We will also see how the blockchain network chaincode function \textbf{queryAllProducts} is called from the front-end application.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{getp.png}
+\caption{The view for displaying all the products in the blockchain.}
+\label{fig:ga}
+\end{center}
+\end{figure}
+Figure \ref{fig:ga} shows the product detail view as the product flows in the supply chain. The information about products get updated depending upon the user functions.
+\begin{Listing}[h!]
+\begin{lstlisting}
+//define the object for the Fabric_Client SDK connection
+var fabric_client = new Fabric_Client();
+
+// setup the fabric network
+//defines the name of the channel on which peer has to execute transaction
+var channel = fabric_client.newChannel('mychannel');
+//creates a peer object by passing its unique docker url
+var peer = fabric_client.newPeer('grpc://192.168.99.100:7051');
+//adds the peer object to the channel object for transaction execution
+channel.addPeer(peer);
+\end{lstlisting}
+\caption{Code snippet for the connecting to the Fabric Client SDK.}
+\label{lst:fc}
+\end{Listing}
+\begin{Listing}[h!]
+\begin{lstlisting}
+// queryAllProducts - requires no arguments , ex: args: [''],
+    const request = {                 //request defines the request object created
+    chaincodeId: 'product-chaincode', //the chaincode name on which transaction is executed
+    txId: tx_id,                      //transaction id assigned to this action
+    fcn: 'queryAllProducts',          //chaincode function name
+    args: ['']                        //args represent the function parameters
+};
+\end{lstlisting}
+\caption{Code snippet for the \textit{queryAllProducts} method in the controller function that calls the chaincode with the chaincodeId}
+\label{lst:gapd}
+\end{Listing}
+
+\subsection{Get Product by Id}
+This view represents the specific product that can be viewed by passing its product id. It requires one parameter, the name of the key which has to be searched in the world state. In our scenario, the key is the product id that was created by the user or during initialization.
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{getPId.png}
+\caption{The view for fetching a product by its id in the blockchain.}
+\label{fig:gpi}
+\end{center}
+\end{figure}
+\begin{Listing}[h!]
+\begin{lstlisting}
+// queryProduct - requires 1 argument, ex: args: ['4'],
+    //the request object created to pass to the client SDK
+    const request = { 
+    //name of the installed chaincode for transaction execution
+    chaincodeId: 'product-chaincode', 
+    //the generated transaction id
+    txId: tx_id,
+    //name of the method in the chaincode
+    fcn: 'queryProduct',
+    //the value of the id passed to the controller
+    args: [id]                    
+};
+\end{lstlisting}
+\caption{Code snippet for the \textit{queryProduct} method in the controller function that calls the chaincode with the chaincodeId}
+\label{lst:gapi}
+\end{Listing}
+
+\subsection{Create a Product}
+Here we will see the view designed for creating a new product in the blockchain network. The producer has the permissions to create a new product that becomes part of the supply chain.
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth, height=9cm, keepaspectratio]{graphics/createProductSuccess.png}
+\caption{The view for creating a new product and the acknowledgement of the transaction with transaction id}
+\label{fig:cp}
+\end{center}
+\end{figure}
+\begin{Listing}[h!]
+\begin{lstlisting}
+ // the request object is sent to the endorser as a proposal
+    const request = {
+    //name of the installed chaincode for transaction execution
+    chaincodeId: 'product-chaincode',
+    //name of the method in the chaincode
+    fcn: 'createProduct',
+    //the required fields passed to the controller
+    args: [id, price, location, timestamp, owner],
+    //name of the channel
+    chainId: 'mychannel',
+    //the generated transaction id
+    txId: tx_id
+};
+
+// after the request is created, the transaction proposal is sent to the peers
+\end{lstlisting}
+\caption{Code snippet for the \textit{createProduct} method in the controller function that calls the chaincode with the chaincodeId}
+\label{lst:cpr}
+\end{Listing}
+
+\subsection{Update a Product}
+As the product flows in the supply chain, it constantly changes hands. It is therefore, essential to update the recent owner of a product so that any future issues can be easily resolved. The Supplier and Buyer are the one who are between the Consumer and Producer. The product is updated whenever it flows from one user to the other.
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{graphics/updateProductSuccess.png}
+\caption{The view for updating a product with the new owner.}
+\label{fig:up}
+\end{center}
+\end{figure}
+\begin{Listing}[h!]
+\begin{lstlisting}
+ // the transaction proposal is created here and sent to endorser
+    var request = {
+    //name of the installed chaincode for transaction execution
+    chaincodeId: 'product-chaincode',
+    //name of the method in the chaincode
+    fcn: 'changeProductOwner',
+    //the required fields passed to the controller
+    args: [id, owner],
+    //name of the channel
+    chainId: 'mychannel',
+    //the transaction id generated in the request
+    txId: tx_id
+};
+
+// after the request is created, the transaction proposal is sent to the peers
+\end{lstlisting}
+\caption{Code snippet for the \textit{changeProductOwner} method in the controller function that calls the chaincode with the chaincodeId}
+\label{lst:upr}
+\end{Listing}
+
+\section{Android application}
+The Android application is designed keeping the \textbf{Consumer} in mind. The consumer has no direct access to the web application. Thus, in order to check if a product has gone through all the required tests or to check if the product is illegitimate, the Consumer can use the app, scan the QR-Code on the product and verify the product details.
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{graphics/app1.pdf}
+\caption{The mobile app screens designed for the blockchain network}
+\label{fig:app1}
+\end{center}
+\end{figure}
+
+Figure \ref{fig:app1} shows the different screens designed for the Android app. Authentication is required for the user to login to the blockchain network and to use the app. With the correct credentials, the view with the designated functions is shown to the user. For example, \textbf{Admin} user sees all the functions in the app. The \textbf{Consumer} can see the two relevant functions like \textit{Get a Product by its ID}, where the numeric id can be entered on the screen by the consumer, and \textit{Get a Product by scanning QR} where a QR can be scanned for the Product ID and the result will be shown as displayed in the third screen.
+
+The app also works in the same way as the front-end web application works. The app is designed in JAVA using the Android SDK and is compatible with the Android devices running Android 3.0 or higher. 
+
+Figure \ref{fig:arch2} shows the architecture of the app that uses the backend developed in Node.js. The request proposal is sent to the backend which then forwards it to the respective chaincode method. The chaincode method is executed on the peer and the transaction proposal response is sent back to the Node.js backend. The response is returned as a JSON response to the app which then parses the object and shows the result back to the user. The use cases in the app are similar to the web frontend application with additional feature of QR scanning for the product id.
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{graphics/arch2.pdf}
+\caption{The architecture of the mobile application interacting with the blockchain network.}
+\label{fig:arch2}
+\end{center}
+\end{figure}
+
+Figure \ref{fig:app2} shows the extension of the mobile application that can be designed to provide the important functionality of traceability and quality assurance. The extension is not discussed here and just shows the idea but can be implemented as a future work for the app.
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{graphics/app2.pdf}
+\caption{The extension of the app that can be used to view the status and other information about a product.}
+\label{fig:app2}
+\end{center}
+\end{figure}
 
 \chapter{Experimental Design and Results}
+In this chapter, we will discuss the different experiments performed with the blockchain network to study various important transaction characteristics of permissioned blockchain networks. The business logic is written on the chaincode and therefore, the focus will be on chaincodes and the ledger for the experiments. 
 \label{chap:de}
+
 \section{Experiment 1: Chaincode to chaincode call on same channel}
+In this section we will see how a chaincode transaction is scoped when one chaincode calls another chaincode on the same channel. The chaincode call can be a read transaction on the world state or a write transaction on the world state and the blockchain. Therefore, the experiment will be divided into two subsections for read and write. We will verify and put forward the results.
+
 \subsection{Read from same channel}
-\subsection{Write from same channel}
-\subsection{Experimental Results}
+\label{sec:read}
+There are various business transactions that require data from different applications in the network. Chaincodes contain the business logic for the blockchain applications and transactions can only be executed with the chaincodes method on the ledger. It is therefore important to study the behaviour of chaincode in a read operation requiring data from a different chaincode. 
+\subsubsection{Experimental setup}
+In this approach, we will use two different chaincodes, \textit{chaincode1} and \textit{chaincode2}. These chaincodes will be installed on the peer (considering a single peer) and will be on the same channel. In this setup, we will use chaincode2 methods to call chaincode1 method to read the world state. 
 
-\section{Experiment 2: Chaincode to chaincode call on different channels}
-\subsection{Read from different channels}
-\subsection{Write from same channel}
-\subsection{Experimental Results}
+We will first create two keys \textbf{a} and \textbf{b} with some initial value by instantiating the chaincode chaincode1. Then we will instantiate chaincode2 with a key \textbf{sum} and initial value as \textbf{0}. Then with the help of chaincode2, we will call a method that reads the values of \textbf{a} and \textbf{b} and puts the values in the key \textbf{sum} that is scoped to chaincode2. The chaincode1 is based on the code at \cite{ce2} and chaincode2 at \cite{ce5}. 
 
-\section{Experiment 3: Implementation of a 2-P transaction monitor at the application level}
-\subsection{Creating rollback transaction}
-\subsection{Creating compensation action}
-\subsection{Experimental Results}
+Listing \ref{lst:c1i} shows the \textit{invoke} method defined in chaincode1 that deducts value from key \textbf{a} and adds the same value to key \textbf{b}.
 
-\section{Experiment 4: Test for immutability of ledger}
-\subsection{Modifying the world state}
-\subsection{Modifying the peer blockchain}
-\subsection{Modifying the orderer blockchain}
-\subsection{Adding a new peer after tampering blockchain}
-\subsection{Experimental Results}
+Similarly, Listing \ref{lst:c2i} shows the invoke method for the chaincode2 that reads the keys \textbf{a} and \textbf{b} from chaincode1 and shows its sum in the key \textbf{sum} of chaincode2.
+\begin{Listing}[h!]
+\begin{lstlisting}
+/* the experiment is based on the code at https://github.com/hyperledger/fabric/blob/release-1.3/examples/chaincode/go/example02/chaincode.go */
+// Transaction makes payment of X units from A to B
+func (t *SimpleChaincode) invoke(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	
+    //A and B are the arguments or keys initialized
+	A = args[0]
+	B = args[1]
+
+	// Get the state from the ledger
+	Avalbytes, err := stub.GetState(A)
+	if err != nil {
+		return shim.Error("Failed to get state")
+	}
+	Aval, _ = strconv.Atoi(string(Avalbytes))
+
+	Bvalbytes, err := stub.GetState(B)
+	if err != nil {
+		return shim.Error("Failed to get state")
+	}
+	Bval, _ = strconv.Atoi(string(Bvalbytes))
+
+	// Perform the execution
+	X, err = strconv.Atoi(args[2])
+	if err != nil {
+		return shim.Error("Invalid transaction amount, expecting a integer value")
+	}
+	//sends a value from A to B
+	Aval = Aval - X
+	Bval = Bval + X
+	fmt.Printf("Aval = %d, Bval = %d\n", Aval, Bval)
+
+	// Write the state back to the ledger
+	err = stub.PutState(A, []byte(strconv.Itoa(Aval)))
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	err = stub.PutState(B, []byte(strconv.Itoa(Bval)))
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(nil)
+}
+
+\end{lstlisting}
+\caption{Code snippet for the \textit{invoke} method in the chaincode1}
+\label{lst:c1i}
+\end{Listing}
+\begin{Listing}[h!]
+\begin{lstlisting}
+/* the experiment is based on the code at https://github.com/hyperledger/fabric/blob/release-1.3/examples/chaincode/go/example05/chaincode.go */
+// Invoke queries another chaincode and updates its own state
+func (t *SimpleChaincode) invoke(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	var sum, channelName string // Sum entity
+	var Aval, Bval, sumVal int  // value of sum entity - to be computed
+	var err error
+	chaincodeName := args[0] // Expecting name of the chaincode you would like to call, this name would be given during chaincode install time
+	sum = args[1]
+
+	if len(args) > 2 {
+		channelName = args[2]
+	} else {
+		channelName = ""
+	}
+
+	// Query chaincode1
+	f := "query"
+	queryArgs := toChaincodeArgs(f, "a")
+
+	//   if chaincode being invoked is on the same channel,
+	//   then channel defaults to the current channel and args[2] can be "".
+	//   If the chaincode being called is on a different channel,
+	//   then you must specify the channel name in args[2]
+
+	response := stub.InvokeChaincode(chaincodeName, queryArgs, channelName)
+	Aval, err = strconv.Atoi(string(response.Payload))
+	
+	queryArgs = toChaincodeArgs(f, "b")
+	response = stub.InvokeChaincode(chaincodeName, queryArgs, channelName)
+	
+	Bval, err = strconv.Atoi(string(response.Payload))
+	// Compute sum
+	sumVal = Aval + Bval
+
+	// Write sumVal back to the ledger
+	err = stub.PutState(sum, []byte(strconv.Itoa(sumVal)))
+	fmt.Printf("Invoke chaincode successful. Got sum %d\n", sumVal)
+	return shim.Success([]byte(strconv.Itoa(sumVal)))
+}
+\end{lstlisting}
+\caption{Code snippet for the \textit{invoke} method in the chaincode2}
+\label{lst:c2i}
+\end{Listing}
+\clearpage
+The various steps followed to install the chaincode and perform the operations can be described as follows:
+\subsubsection{Install chaincode}
+\begin{Listing}[h!]
+\begin{lstlisting}
+//installs the chaincode1 with name as chaincode1 on channel mychannel and the chaincode file is located at the path specified by -p
+peer chaincode install -n chaincode1 -C mychannel -v 1.0 -p github.com/chaincode/chaincode1/
+//installs the chaincode2 with name as chaincode2 on channel mychannel and the chaincode file is located at the path specified by -p
+peer chaincode install -n chaincode2 -v -C mychannel 1.0 -p github.com/chaincode/chaincode2/
+\end{lstlisting}
+\caption{cli command for chaincode \textit{install}}
+\label{lst:ci}
+\end{Listing}
+
+\subsubsection{Instantiate chaincode}
+\begin{Listing}[h!]
+\begin{lstlisting}
+//instantiates chaincode1 with key a=100, b=200 and the endorsement policy is specified with -P, -o specifies the orderer endpoint
+peer chaincode instantiate -o 127.0.0.1:7050 -C $CHANNEL_NAME -n chaincode1 -v 1.0 -c '{"Args":["init","a", "100", "b","200"]}' -P "OR ('Org1MSP.member','Org2MSP.member')"
+
+//instantiates chaincode2 with key sum=0 and the endorsement policy is specified with -P, -o specifies the orderer endpoint
+peer chaincode instantiate -o 127.0.0.1:7050 -C $CHANNEL_NAME -n chaincode2 -v 1.0 -c '{"Args":["init","sum", "0"]}' -P "OR ('Org1MSP.member','Org2MSP.member')"
+\end{lstlisting}
+\caption{cli command for chaincode \textit{instantiate}}
+\label{lst:cin}
+\end{Listing}
+\subsubsection{Query chaincode}
+\begin{Listing}[h!]
+\begin{lstlisting}
+peer chaincode query -C $CHANNEL_NAME -n chaincode1 -c '{"Args":["query","a"]}' //response is a=100
+peer chaincode query -C $CHANNEL_NAME -n chaincode1 -c '{"Args":["query","b"]}' //response is b=200
+//the args specifies in order the method in chaincode2 to call, the target callee chaincode name as chaincode1, the key in which value is stored and the channel name on which chaincode1 is installed.
+peer chaincode query -n chaincode2 -c '{"Args":["query","chaincode1","sum","mychannel"]}' //response is sum=300
+\end{lstlisting}
+\caption{cli command for chaincode \textit{query}}
+\label{lst:cq}
+\end{Listing}
+
+\clearpage
+\subsubsection{Invoke chaincode}
+\begin{Listing}[h!]
+\begin{lstlisting}
+peer chaincode invoke -o 127.0.0.1:7050 -C $CHANNEL_NAME -n chaincode1 -c '{"Args":["invoke","a","b","10"]}' //transfers 10 from a to b
+
+peer chaincode invoke -o 127.0.0.1:7050 -C $CHANNEL_NAME -n chaincode2 -c '{"Args":["invoke","chaincode1","sum","mychannel"]}' //adds the value of a and b in chaincode1 and saves sum=300
+\end{lstlisting}
+\caption{cli command for chaincode \textit{invoke}}
+\label{lst:civ}
+\end{Listing}
+
+\subsubsection{Final Query}
+\begin{Listing}[h!]
+\begin{lstlisting}
+peer chaincode query -C $CHANNEL_NAME -n chaincode1 -c '{"Args":["query","a"]}' //response is a=90
+peer chaincode query -C $CHANNEL_NAME -n chaincode1 -c '{"Args":["query","b"]}' //response is b=210
+peer chaincode query -n chaincode2 -c '{"Args":["query","chaincode1","sum","mychannel"]}' //response is sum=300
+\end{lstlisting}
+\caption{cli command for chaincode \textit{query}}
+\label{lst:cf}
+\end{Listing}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{graphics/readsc.png}
+\caption{The overall flow of read operation from a different chaincode}
+\label{fig:readsc}
+\end{center}
+\end{figure}
+The overall flow of the experiment can be seen in the Figure \ref{fig:readsc}. The figure shows the different operations that reads values from chaincode1 and returns those values to chaincode2 for further calculations.
+\subsubsection{Results}
+The above experiment to read the chaincode state from different chaincode can be summarized in the Table \ref{tab:result1}. The table shows the different values of the chaincode keys after different operations were performed. The key \textbf{sum} that belongs to \textbf{chaincode2} contains the sum of the values read for key \textbf{a} and the key \textbf{b} from \textbf{chaincode1}.
+\begin{table}[h!]
+\begin{center}
+    \begin{tabular}{ |l|l|l|l|l|l|}
+    \hline
+    \multirow{2}{*}{\textbf{Keys}} & \multicolumn{5}{c|}{\textbf{Chaincode Operations}}\\ \cline{2-6}
+    &\textbf{Install}& \textbf{Instantiate}& \textbf{Query}& \textbf{Invoke}& \textbf{Final Query} \\ \hline
+    \textbf{a} & - & 100 & 100 & 90 & 90 \\ \hline
+    \textbf{b} & - & 200 & 200 & 210 & 210 \\ \hline
+    \textbf{sum} & - & 0 & 300 & 300 & 300 \\ \hline
+    \end{tabular}
+\end{center}
+\caption{Different values for the keys during different chaincode operations.}
+    \label{tab:result1}
+\end{table}
+\subsubsection{Conclusion of Results}
+The experiment helps us to conclude that \begin{enumerate}
+    \item A chaincode can read states of other chaincodes in the same channel with proper authorization.
+    \item The caller chaincode, \textbf{chaincode2} interprets the object in the chaincode logic, and this object is not part of the MVCC for chaincode2 unless the caller chaincode writes it back to the ledger (using putState). 
+    \item Any error in the called method of a different chaincode can be handled in the business logic of the caller chaincode that helps to create nested transactions characterized by read operations across different chaincodes that are both \textbf{atomic} and \textbf{consistent}.
+\end{enumerate} 
+
+\subsection{Write on same channel}
+In the previous experiment, we have seen that chaincode can read state of another chaincode within the same channel. In this experiment, we will try to write to a chaincode state by executing a method of a different chaincode.
+
+\subsubsection{Experimental setup}
+For the experiment, we will use the same two chaincodes, \textbf{chaincode1} and \textbf{chaincode2} discussed in the previous subsection. However, we will create a new method in chaincode2 that writes a value to the keys belonging to chaincode1.
+
+The method in chaincode2 will deduct value of key \textbf{a} by amount \textbf{x} and increase the value of key \textbf{b} by the same amount \textbf{x}. It is important to note that the operation will be called on \textbf{chaincode2} and the keys belong to \textbf{chaincode1}.
+\begin{Listing}[h!]
+\begin{lstlisting}
+//write method for writing to chaincode1
+func (t *SimpleChaincode) write(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	var channelName string // channel Name
+	var A, B string        // Entities
+	var X int              // Transaction value
+	var err1 error
+
+	chaincodeName := args[0] // Expecting name of the chaincode you would like to call, this name would be given during chaincode install time
+	A = args[1]
+	B = args[2]
+	X, err1 = strconv.Atoi(args[3])
+
+	if len(args) > 2 {
+		channelName = args[4]
+	} else {
+		channelName = ""
+	}
+
+	// invoke function of chaincode1 is called that puts A=A-X and B=B+X
+	f := "invoke"
+	queryArgs := toChaincodeArgs(f, A, B, strconv.Itoa(X))
+	response := stub.InvokeChaincode(chaincodeName, queryArgs, channelName)
+	if response.Status != shim.OK {
+		errStr := fmt.Sprintf("Failed to query chaincode. Got error: %s", response.Payload)
+		fmt.Printf(errStr)
+		return shim.Error(errStr)
+	}
+	fmt.Printf("Query Response:%s\n", X)
+	return shim.Success([]byte(strconv.Itoa(X)))
+}
+\end{lstlisting}
+\caption{Code snippet for the \textit{write} method in the chaincode2}
+\label{lst:cw}
+\end{Listing}
+
+In section \ref{sec:read}, we have already seen how the chaincodes are installed in listing \ref{lst:ci}, instantiated in listing \ref{lst:cin} and queried in listing \ref{lst:cq}. The new operation introduced in this section is invoking a method \textbf{write} that will write to chaincode1 state.
+
+\subsubsection{Invoke chaincode}
+\begin{Listing}[h!]
+\begin{lstlisting}
+peer chaincode invoke -o 127.0.0.1:7050 -C $CHANNEL_NAME -n chaincode1 -c '{"Args":["invoke","a","b","10"]}' //transfers 10 from a to b, a=90, b=210
+peer chaincode invoke -o 127.0.0.1:7050 -C $CHANNEL_NAME -n chaincode2 -c '{"Args":["write","chaincode1","a","b","27","mychannel"]}' //calls the invoke method of chaincode1 that transfers 27 from a to b, a=63, b=237
+\end{lstlisting}
+\caption{cli command for chaincode \textit{invoke} with write operation}
+\label{lst:winv}
+\end{Listing}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{graphics/writesc.png}
+\caption{The overall flow of write operation from a different chaincode}
+\label{fig:writesc}
+\end{center}
+\end{figure}
+The overall flow of the experiment can be seen in the Figure \ref{fig:writesc}. The figure shows the different operations that invokes method on chaincode1 which in turn writes the passed values from chaincode2 to the keys of chaincode1.
+
+\subsubsection{Results}
+The above experiment to write to the chaincode state from a  different chaincode can be summarized in the Table \ref{tab:result2}. The table shows the different values of the chaincode keys after different operations were performed. The keys \textbf{a} and \textbf{b} belong to \textbf{chaincode1} and their values are modified by calling a write operation from \textbf{chaincode2}.
+\begin{table}[h!]
+\begin{center}
+    \begin{tabular}{ |l|l|l|l|l|l|}
+    \hline
+    \multirow{2}{*}{\textbf{Keys}} & \multicolumn{5}{c|}{\textbf{Chaincode Operations}}\\ \cline{2-6}
+    &\textbf{Install}& \textbf{Instantiate}& \textbf{Query}& \textbf{Invoke\_cc1}& \textbf{Invoke\_cc2} \\ \hline
+    \textbf{a} & - & 100 & 100 & 90 & 63 \\ \hline
+    \textbf{b} & - & 200 & 200 & 210 & 237 \\ \hline
+    \end{tabular}
+\end{center}
+\caption{Different values for the keys during different chaincode operations.}
+\label{tab:result2}
+\end{table}
+\subsubsection{Conclusion of Results}
+The experiment helps us to conclude that \begin{enumerate}
+    \item A chaincode can read states of other chaincodes in the same channel with proper authorization.
+    \item The caller chaincode, \textbf{chaincode2} interprets the object in the chaincode logic, and this object is not part of the MVCC for chaincode2 unless the caller chaincode writes it back to the ledger (using putState). 
+    \item Any error in the called method of a different chaincode can be handled in the business logic of the caller chaincode that helps to create nested transactions characterized by read operations across different chaincodes that are both \textbf{atomic} and \textbf{consistent}.
+\end{enumerate}
 
 \chapter{Conclusion and Future Work}
+In this chapter
 \label{chap:cf}
 \section*{Future Work}
 
