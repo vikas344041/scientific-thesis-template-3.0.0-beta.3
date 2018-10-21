@@ -782,7 +782,7 @@ Chaincodes affect the \textbf{consistency} \textbf{isolation} and \textbf{atomic
     \item \textbf{Same channel read operation}: It is possible to call a chaincode from another chaincode on the same channel to read the world state. This will be included in a single transaction and will respect the atomicity guarantee.
     \item \textbf{Different channel read operation}: Reads from a chaincode on a different channel are also possible. However, there is no MVCC check of the read value and the caller has to maintain the state in its own transaction context. If the caller has no access to the callee channel, the read will fail.
     \item \textbf{Same channel write operation}: The called chaincode has its own individual read write sets within the caller's transaction context. Therefor, committing this transaction will involve multiple chaincode's read-write sets on a single MVCC check.If there exists any key-version check failure from any involved chaincodes, the whole transaction will fail. This provides \textbf{atomicity} and \textbf{consistency} to the transactions \cite{jira}.
-    \item \textbf{Different channel write operation}: The same transaction context cannot be used when different channels are involved. There are different ledgers involved with different key sets. In order to atomically co-ordinate the sub-transactions, the caller has to create an intermediate implementation like a 2-P commit that handles all the sub-transactions in a single transaction context \cite{jira}.
+    \item \textbf{Different channel write operation}: The same transaction context cannot be used when different channels are involved. There are different ledgers involved with different key sets. In order to atomically co-ordinate the sub-transactions, the caller has to create an intermediate implementation like a 2-PC transaction monitor that handles all the sub-transactions in a single transaction context \cite{jira}.
 \end{enumerate}
 
 \section{Effect of endorsement policy on transactional properties}
@@ -1390,6 +1390,7 @@ In this chapter, we will discuss the different experiments performed with the bl
 \label{chap:de}
 
 \section{Experiment 1: Chaincode to chaincode call on same channel}
+\label{sec:exp1}
 In this section we will see how a chaincode transaction is scoped when one chaincode calls another chaincode on the same channel. The chaincode call can be a read transaction on the world state or a write transaction on the world state and the blockchain. Therefore, the experiment will be divided into two subsections for read and write. We will verify and put forward the results.
 
 \subsection{Read from same channel}
@@ -1591,6 +1592,7 @@ The experiment helps us to conclude that \begin{enumerate}
 \end{enumerate} 
 
 \subsection{Write on same channel}
+\label{ssec:wsc}
 In the previous experiment, we have seen that chaincode can read state of another chaincode within the same channel. In this experiment, we will try to write to a chaincode state by executing a method of a different chaincode.
 
 \subsubsection{Experimental setup}
@@ -1671,16 +1673,332 @@ The above experiment to write to the chaincode state from a  different chaincode
 \end{table}
 \subsubsection{Conclusion of Results}
 The experiment helps us to conclude that \begin{enumerate}
-    \item A chaincode can read states of other chaincodes in the same channel with proper authorization.
-    \item The caller chaincode, \textbf{chaincode2} interprets the object in the chaincode logic, and this object is not part of the MVCC for chaincode2 unless the caller chaincode writes it back to the ledger (using putState). 
-    \item Any error in the called method of a different chaincode can be handled in the business logic of the caller chaincode that helps to create nested transactions characterized by read operations across different chaincodes that are both \textbf{atomic} and \textbf{consistent}.
+    \item A chaincode can write states to other chaincodes in the same channel with proper authorization.
+    \item The key version check will take place for both the chaincodes in a single transaction context and if any check fails, the whole transaction will be termed as invalid. 
+    \item Nested transactions spanning two different chaincodes can be considered as \textbf{atomic} and \textbf{consistent}.
 \end{enumerate}
 
-\chapter{Conclusion and Future Work}
-In this chapter
-\label{chap:cf}
-\section*{Future Work}
+\section{Experiment 2: Chaincode to chaincode call on different channels}
+In this section, we will perform the same experiment as in section \ref{sec:exp1} but the two chaincodes will be installed on different channels on a single peer.
 
+\subsection{Read from different channels}
+\label{subs:read2}
+We will use the same two chaincodes,\textbf{chaincode1} and \textbf{chaincode2} discussed in the previous section. The goal will be to call a chaincode method to read its state that is present on a different channel but on the same peer.
+\subsubsection{Experimental setup}
+The steps are similar to what is described in section \ref{sec:read} with a major difference in the chaincode path. The \textbf{chaincode1} will be installed on \textbf{mychannel1} and \textbf{chaincode2} on \textbf{mychannel2} with the code in the two chaincodes remaining the same.
+
+The \textbf{chaincode2} will invoke a method on \textbf{chaincode1} that queries and reads the states for keys, \textbf{a} and \textbf{b} belonging to chaincode1. These read values will be added and saved in the key \textbf{sum} belonging to chaincode2.
+
+The different steps to perform the experiment can be highlighted as follows:
+\subsubsection{Install chaincode}
+\begin{Listing}[h!]
+\begin{lstlisting}
+//installs the chaincode1 with name as chaincode1 on channel mychannel1 and the chaincode file is located at the path specified by -p
+peer chaincode install -n chaincode1 -C mychannel1 -v 1.0 -p github.com/chaincode/chaincode1/
+//installs the chaincode2 with name as chaincode2 on channel mychannel2 and the chaincode file is located at the path specified by -p
+peer chaincode install -n chaincode2 -v -C mychannel2 1.0 -p github.com/chaincode/chaincode2/
+\end{lstlisting}
+\caption{cli command for chaincode \textit{install}}
+\label{lst:ci2}
+\end{Listing}
+
+\subsubsection{Instantiate chaincode}
+\begin{Listing}[h!]
+\begin{lstlisting}
+//instantiates chaincode1 on channel mychannel1 with key a=100, b=200 and the endorsement policy is specified with -P, -o specifies the orderer endpoint
+peer chaincode instantiate -o 127.0.0.1:7050 -C mychannel1 -n chaincode1 -v 1.0 -c '{"Args":["init","a", "100", "b","200"]}' -P "OR ('Org1MSP.member','Org2MSP.member')"
+
+//instantiates chaincode2 on channel mychannel2 with key sum=0 and the endorsement policy is specified with -P, -o specifies the orderer endpoint
+peer chaincode instantiate -o 127.0.0.1:7050 -C mychannel2 -n chaincode2 -v 1.0 -c '{"Args":["init","sum", "0"]}' -P "OR ('Org1MSP.member','Org2MSP.member')"
+\end{lstlisting}
+\caption{cli command for chaincode \textit{instantiate}}
+\label{lst:cin2}
+\end{Listing}
+\subsubsection{Query chaincode}
+\begin{Listing}[h!]
+\begin{lstlisting}
+peer chaincode query -C mychannel1 -n chaincode1 -c '{"Args":["query","a"]}' //response is a=100
+peer chaincode query -C mychannel1 -n chaincode1 -c '{"Args":["query","b"]}' //response is b=200
+//the args specifies in order the method in chaincode2 to call, the target callee chaincode name as chaincode1, the key in which value is stored and the channel name on which chaincode1 is installed which is mychannel1.
+peer chaincode query -n chaincode2 -C mychannel2 -c '{"Args":["query","chaincode1","sum","mychannel1"]}' //response is sum=300
+\end{lstlisting}
+\caption{cli command for chaincode \textit{query}}
+\label{lst:cq2}
+\end{Listing}
+\subsubsection{Invoke chaincode}
+\begin{Listing}[h!]
+\begin{lstlisting}
+peer chaincode invoke -o 127.0.0.1:7050 -C mychannel1 -n chaincode1 -c '{"Args":["invoke","a","b","10"]}' //transfers 10 from a to b
+
+peer chaincode invoke -o 127.0.0.1:7050 -C mychannel2 -n chaincode2 -c '{"Args":["invoke","chaincode1","sum","mychannel1"]}' //adds the value of a and b scoped to chaincode1 and saves sum=300 scoped to chaincode2
+\end{lstlisting}
+\caption{cli command for chaincode \textit{invoke}}
+\label{lst:civ2}
+\end{Listing}
+\clearpage
+\subsubsection{Final Query}
+\begin{Listing}[h!]
+\begin{lstlisting}
+peer chaincode query -C mychannel1 -n chaincode1 -c '{"Args":["query","a"]}' //response is a=90
+peer chaincode query -C mychannel1 -n chaincode1 -c '{"Args":["query","b"]}' //response is b=210
+peer chaincode query -n chaincode2 -C mychannel2 -c '{"Args":["query","chaincode1","sum","mychannel1"]}' //response is sum=300
+\end{lstlisting}
+\caption{cli command for chaincode \textit{query}}
+\label{lst:cf2}
+\end{Listing}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{graphics/readsc2.png}
+\caption{The overall flow of read operation from a different chaincode on different channels}
+\label{fig:readsc2}
+\end{center}
+\end{figure}
+The overall flow of the experiment can be seen in the Figure \ref{fig:readsc2}. The figure shows the different operations that reads values from chaincode1 and returns those values to chaincode2 for further calculations.
+\subsubsection{Results}
+\begin{table}[h!]
+\begin{center}
+    \begin{tabular}{ |l|l|l|l|l|l|}
+    \hline
+    \multirow{2}{*}{\textbf{Keys}} & \multicolumn{5}{c|}{\textbf{Chaincode Operations}}\\ \cline{2-6}
+    &\textbf{Install}& \textbf{Instantiate}& \textbf{Query}& \textbf{Invoke}& \textbf{Final Query} \\ \hline
+    \textbf{a} & - & 100 & 100 & 90 & 90 \\ \hline
+    \textbf{b} & - & 200 & 200 & 210 & 210 \\ \hline
+    \textbf{sum} & - & 0 & 300 & 300 & 300 \\ \hline
+    \end{tabular}
+\end{center}
+\caption{Different values for the keys during different chaincode operations.}
+    \label{tab:result12}
+\end{table}
+The above experiment to read the chaincode state from different chaincodes on different channels can be summarized in the Table \ref{tab:result12}. The table shows the different values of the chaincode keys after different operations were performed. The key \textbf{sum} that belongs to \textbf{chaincode2} on channel \textbf{mychannel2} contains the sum of the values read for key \textbf{a} and the key \textbf{b} from \textbf{chaincode1} that belongs on channel \textbf{mychannel1}. The experiment was also performed for different values of \textbf{a} and \textbf{b} and it concurred with the previous result.
+
+\subsubsection{Conclusion of Results}
+The experiment helps us to conclude that 
+\begin{enumerate}
+    \item A chaincode can read states of other chaincodes on different channels with proper authorization.
+    \item The caller chaincode, \textbf{chaincode2} interprets the object in the chaincode logic, and this object is not part of the MVCC for chaincode2 unless the caller chaincode writes it back to the ledger (using putState). 
+    \item Any error in the called method of a different chaincode can be handled in the business logic of the caller chaincode that can help to create nested transactions characterized by read operations across different chaincodes that are both \textbf{atomic} and \textbf{consistent}.
+    \item The check will be based on read-write set of the callee chaincode, \textbf{chaincode1}, and hence, \textbf{chaincode2} should have read access for channel \textbf{mychannel1}.  
+\end{enumerate} 
+
+\subsection{Write on different channels}
+In the previous experiment, we have seen that chaincode can read state of another chaincode present in a different channel. In this experiment, we will try to write to a chaincode state by executing a method of a different chaincode on a different channel.
+
+\subsubsection{Experimental setup}
+For the experiment, we will use the same two chaincodes, \textbf{chaincode1} and \textbf{chaincode2} discussed in the previous section and the method \textbf{write} discussed in listing \ref{lst:cw}.
+
+We will call a method \textbf{write} defined in chaincode2 on channel \textbf{mychannel2}. The entire setup is similar to subsection \ref{ssec:wsc} with the only difference that chaincode1 will be on channel \textbf{mychannel1} and chaincode2 on \textbf{mychannel2}. 
+
+The steps include Install, Instantiate, Query, Invoke and Final Query as outlined in previous subsection. Lets see the Invoke and Query results.
+\clearpage
+\subsubsection{Invoke chaincode}
+\begin{Listing}[h!]
+\begin{lstlisting}
+peer chaincode invoke -o 127.0.0.1:7050 -C mychannel1 -n chaincode1 -c '{"Args":["invoke","a","b","10"]}' //transfers 10 from a to b, a=90, b=210
+peer chaincode invoke -o 127.0.0.1:7050 -C mychannel2 -n chaincode2 -c '{"Args":["write","chaincode1","a","b","27","mychannel1"]}' //the write results in no change to values of a and b, a=90 and b=210
+\end{lstlisting}
+\caption{cli command for chaincode \textit{invoke} with write operation on different channels}
+\label{lst:winv2}
+\end{Listing}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{graphics/writesc2.png}
+\caption{The overall flow of write operation from a different chaincode on a different channel}
+\label{fig:writesc2}
+\end{center}
+\end{figure}
+The overall flow of the experiment can be seen in the Figure \ref{fig:writesc2}. The figure shows the different operations that invokes method on chaincode1 which in turn tries to update the state of chaincode1 on channel \textbf{mychannel1}.
+
+\subsubsection{Results}
+The above experiment to write to the chaincode state from a  different chaincode on a different channel can be summarized in the Table \ref{tab:result22}. The table shows the different values of the chaincode keys after different operations were performed. The keys \textbf{a} and \textbf{b} belong to \textbf{chaincode1} on channel \textbf{mychannel1}.
+\begin{table}[h!]
+\begin{center}
+    \begin{tabular}{ |l|l|l|l|l|l|}
+    \hline
+    \multirow{2}{*}{\textbf{Keys}} & \multicolumn{5}{c|}{\textbf{Chaincode Operations}}\\ \cline{2-6}
+    &\textbf{Install}& \textbf{Instantiate}& \textbf{Query}& \textbf{Invoke\_cc1}& \textbf{Invoke\_cc2} \\ \hline
+    \textbf{a} & - & 100 & 100 & 90 & 90 \\ \hline
+    \textbf{b} & - & 200 & 200 & 210 & 210 \\ \hline
+    \end{tabular}
+\end{center}
+\caption{Different values for the keys during different chaincode operations.}
+\label{tab:result22}
+\end{table}
+\subsubsection{Conclusion of Results}
+The experiment helps us to conclude that 
+\begin{enumerate}
+\item A chaincode on one channel cannot write to a chaincode state on a different channel.
+\item Since every channel maintains its own ledger, it is not possible to update the state in a different channel.
+\item In case a transaction consists of multiple sub-transactions, a 2-PC transaction monitor will be required that will manage the atomic commits and keep the blockchain and world state consistent.
+\end{enumerate}
+
+\section{Experiment 3: Implementation of an intermediate layer for transaction management}
+In the previous sections, we were able to conclude that chaincode to chaincode write is not possible if the two chaincodes are on separate channels. Channels in Hyperledger Fabric are created to provide data privacy to the member of that channel and hence, an external write request fails \cite{Channels}. But a business transaction may include scenarios that require write on different channels and within the same transaction context. In short, a large business transaction may consist of smaller transactions that have write operations on different channels.
+
+There are different alternatives with the use of channels as discussed down below:
+\begin{enumerate}
+    \item Use of a single channel and private data collection to provide privacy for only the data that is sensitive and cannot be shared with other peers on the channel. It will serve the purpose of multiple channels for data confidentiality.
+    \item Use of single channel with data encryption.
+    \item Use of multiple channels with an intermediate implementation of a software layer like a 2-PC transaction monitor on the application side that has access to all the channel's data and manages the dependent transactions. This layer has to take care of \textbf{rollback}, \textbf{compensation action} and \textbf{commit} for all the transactions. However, this type of implementation will make the network slow.
+\end{enumerate}
+
+We will focus on the third approach above and create a software implementation on the client application that handles multiple transactions within a single transaction context.
+
+\subsection{Use case scenario}
+Consider a scenario involving a large business transaction spanning 2 channels, \textbf{mychannel2} and \textbf{mychannel3}. Consider there is a \textbf{supplier1} and \textbf{company1} on \textbf{mychannel2} and \textbf{supplier2} and \textbf{company1} on \textbf{mychannel3}. Now consider a large business transaction such that the price on \textbf{mychannel2} for a product will be reduced if and only if the price of the product can be increased on \textbf{mychannel3}. These are 2 sub-transactions part of a large single business transaction. Since, we cannot write to a different channel, a software implementation that manages the transaction is developed. The developed software implementation is an extension of the application developed in chapter \ref{chap:cs}.
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{graphics/2pcDiagram.png}
+\caption{The overall flow of two separate transactions managed within a single transaction context. }
+\label{fig:2pcDiagram}
+\end{center}
+\end{figure}
+
+Figure \ref{fig:2pcDiagram} shows the system with two different channels. Let us discuss the design of the software layer.
+\begin{enumerate}
+    \item The entire transaction to reduce price on \textbf{mychannel2} and increase price on \textbf{mychannel3} is a single transaction that has to be managed as two sub-transactions by the intermediate software layer.
+    \item The transaction starts by reducing price on channel \textbf{mychannel2}. This is achieved by calling the chaincode method \textbf{reducePrice}. At the same time, the last value for price before reducing it on \textbf{mychannel2} is saved in a \textbf{localStorage} string variable and a boolean variable that stores if \textbf{increasePrice} was successful or not.
+    \item When the \textbf{increasePrice} method is called, the boolean variable \textbf{isPriceIncreased} is set to true. This marks the completion of entire transaction.
+    \item However, there are cases when the transaction for increasing price fails. In that scenario, the boolean variable \textbf{isPriceIncreased} is set to false. The software layer checks regularly if the \textbf{increasePrice} method was successfully executed. If its not successfully executed, a new transaction on \textbf{mychannel2} is submitted that puts the old price in the world state of \textbf{mychannel2}. This is mimicking the \textbf{rollback} transaction but with a \textbf{compensation action} as a blockchain is an append-only ledger.
+    \item Similar check can be carried out for \textbf{reducePrice} as the order of transaction does not matter and in order that the entire transaction is successful, both the transactions should successfully be committed to their respective ledgers.
+    \item Thus the software layer works like a 2-PC transaction monitor for transaction management of multiple sub-transactions spanning different channels.
+\end{enumerate}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=\textwidth]{graphics/2pc.png}
+\caption{The view of the software layer that handles transaction on multiple channels. }
+\label{fig:2pc}
+\end{center}
+\end{figure}
+Figure \ref{fig:2pc} shows the view that helped to conduct the experiment. The two actions, to reduce price and increase price, are put on respective button clicks as shown in the figure for experimentation. However, in real scenarios this will be a single event and can be managed by execution of one method after another with \textbf{callback}.
+
+\subsection{Results}
+With the help of this experiment, the price on both the channels was changed and this was part of a single transaction context. Write on a different channel is not allowed, but with an intermediate software layer we were able to manage transactions spanning multiple channels. It is also possible to rollback the transaction effects on the world state with proper implementation. However, a rollback transaction on the blockchain involves submitting a new transaction that is also recorded on the blockchain as it is an append-only ledger. 
+
+\subsection{Conclusion of Results}
+It is possible to manage transactions spanning different channels. However, this makes the system slow due to an intermediate layer and should be implemented only when it is absolutely essential. It is possible to rollback the transaction effect by submitting a new transaction. In short, the rollback works on the world state and not on the blockchain.
+
+\section{Experiment 4: Test for immutability of ledger}
+The experiments that were performed till now were related to channels and chaincodes. In this experiment, we will focus on the immutability of blockchain component of ledger and also try to change the world state without invoking any chaincode transactions. This experiment will help us to understand how strong is the immutability property of blockchains compared to durability in ACID transactions.
+
+\subsection{Modifying the world state}
+In this experiment we will create a blockchain network with two peers, \textbf{PEER0} belonging to \textbf{Organization1} and \textbf{PEER2} belonging to \textbf{Organization2}. Both the peers will be part of a single channel \textbf{mychannel} and endorsement policy will be set to \textit{OR ('Org1MSP.member','Org2MSP.member')}.
+
+This experiment is based on the \textbf{marbles} example designed by the Hyperledger Fabric community \cite{marbles}. We will use the same setting to test the world state with couchDB container.
+
+Steps to perform the experiment and the corresponding outcome for each step can be outlined as follows:
+\begin{enumerate}
+    \item Joined both the peers, \textbf{PEER0} and \textbf{PEER1} to the channel \textbf{mychannel}.
+    
+    \textbf{Outcome}: The world state is populated in a separate container and can be accessed in the browser through the port specified in the docker-compose file. However, it is important to note that world state is only visible when the peers join the channel.
+    \item An invoke transaction is submitted from \textbf{PEER0} that creates a marble, \textbf{marble1} {\ttfamily\bfseries\slshape \{name:"marble1", size:"20", color:"blue", owner:"vikas"\}}
+    
+    \textbf{Outcome}: The created marble can be seen for each of the peers in their respective containers. At this stage, all the peers have consistent copy of data.
+    \item The value for \textbf{color} field of \textbf{marble1} is changed to \textbf{green} by manually modifying the object in the couchDB host for \textbf{PEER0}.
+    
+    \textbf{Outcome}: A query for \textbf{marble1} on \textbf{PEER0} gave the manually modified value with \textbf{color} as \textbf{green} while a query on \textbf{PEER2} gave the value for \textbf{color} as \textbf{blue} that is the correct one. This shows that the peers are in inconsistent state.
+    \item There is a function in the \textbf{marbles} chaincode called as \textbf{transferMarblesBasedOnColor} that checks the color of the marble and changes its owner. Called this method from \textbf{PEER0} to change the owner to "Ghareeb" for marbles of color \textbf{green} (this is the modified color value on PEER0, and PEER2 holds the right value for color as blue). 
+    
+    \textb{Outcome}: There is no change in owner on any of the peers even when the \textb{PEER0} had manually modified color value as \textb{green}.
+    \item Called the same function \textbf{transferMarblesBasedOnColor} on \textbf{PEER0} but now the color value was \textb{blue} (that is the right one) and new owner as "Ghareeb".
+    
+    \textb{Outcome}: Though the \textb{owner} was changed to "Ghareeb", the \textb{color} field also got modified to \textb{green} (this is wrong value) on both the peers. The data was consistent on both the peers but the color field was incorrect. So instead of {\ttfamily\bfseries\slshape \{name:"marble1", size:"20", color:"blue", owner:"Ghareeb"\}}, it showed {\ttfamily\bfseries\slshape \{name:"marble1", size:"20", color:"green", owner:"Ghareeb"\}}
+\end{enumerate}
+
+\subsubsection{Conclusion of Results}
+\begin{enumerate}
+    \item The above experiment showed that a peer's world state can be accessed and modified leading inconsistent state on that peer. Authentication for the couchDB container should be provided so that unauthorized changes in world state can be avoided. This can be achieved by creating username and password for the admin account.
+    \item It was seen that the malicious peers data can affect the data of all the peers in the blockchain and lead to an \textb{inconsistent} state. The solution for this would be to use a stronger endorsement policy requiring endorsements from multiple peers of all the organizations. Care should be taken to install chaincode on all the endorsing peers (endorsement is generate by executing a transaction and transactions can only be executed by the chaincode).
+\end{enumerate}
+
+\subsection{Modifying the peer blockchain}
+In this experiment, we will try to modify the blockchain file present on the peer and see its effect on query and invoke transactions. The blockchain on a peer container is located at \textb{var/hyperledger/production/ledgersData/chains/chains/mychannel}. Here mychannel is the name of the channel. We will modify the blockchain file for a peer and see its effect.
+
+The same example of \textb{marbles} \cite{marbles} can be used as discussed above. The steps for the experiment can be outlined as follows:
+\begin{enumerate}
+    \item Joined \textb{PEER0} to the channel, \textbf{mychannel} and created a marble object \textbf{marble1} with fields as {\ttfamily\bfseries\slshape \{name:"marble1", size:"20", color:"blue", owner:"vikas"\}}
+    
+    \textb{Outcome}: The \textbf{marble1} object was created and after querying fetched the right results. There is a method called \textbf{getHistoryForMarble} that queries the blockchain for the transaction ids related to the marble name. This method also returned the right transaction id.
+    \item The blockchain file on \textbf{PEER0} was located at {\ttfamily\bfseries\slshape var/hyperledger/production/ledgersData/} and was copied on the desktop to view its content. Then a new transaction was submitted for \textbf{marble2} on the same peer with fields as {\ttfamily\bfseries\slshape \{name:"marble2", size:"70", color:"red", owner:"ghareeb"\}}.
+    
+    \textbf{Outcome}: The data was consistent and both the marbles object were visible in the couchDB container and the query also fetched right results.
+    \item Then copied the blockchain file with the new transaction for \textbf{marble2} on the desktop. Compared the contents of the two blockfiles. Removed the recently added block from new file that had the transaction for \textbf{marble2} and saved this file in the \textbf{PEER0} container. Queried the world state for the \textbf{marble2} and the blockchain with the method \textbf{getHistoryForMarble} for \textbf{marble2}.
+    
+    \textbf{Outcome}: It was found that a query on world state fetched the right result for \textbf{marble2}. However, \textbf{getHistoryForMarble} that queries the blockchain for \textb{marble2} history gave an endorsement failure error. This demonstrates that the blockchain on \textbf{PEER0} has been tampered with.
+    \item Joined a new peer, \textbf{PEER2} to the channel and executed the method \textbf{getHistoryForMarble}. 
+    
+    \textbf{Outcome}: The query executed without errors and contained the transaction history for \textbf{marble1} and \textbf{marble2} executed separately. This indicates that when a new peer joins the channel, its blockchain is created and synced through the blocks in the \textbf{orderer} node. 
+    
+\end{enumerate}
+\subsubsection{Conclusion of Results}
+\begin{enumerate}
+    \item Modifying the blockchain on a peer can be detected and the malicious peer can be removed from the network.
+    \item The queries on keys are executed only on the world state and hence, it is decoupled from the blockchain for queries. Even if the blockchain has been tampered, the world state still contains the right values.
+    \item A new joining peer will never get the tampered blocks and will always contain consistent data.
+\end{enumerate}
+
+\subsection{Modifying the peer and orderer blockchain and then joining a new peer}
+In this subsection, we will modify the blockchain for two peers, \textb{PEER0} and \textbf{PEER2} on the channel, then we will modify the orderer blockchain and then join two new peers, \textbf{PEER1} belonging to \textbf{Org1} and \textbf{PEER3} belonging to \textbf{Org2}. The same example of \textbf{marbles} as in the previous subsections will be used \cite{marbles}. 
+\begin{Listing}[h!]
+\begin{lstlisting}
+    marble1 {name:"marble1", color: "blue", owner: "vikas", size:"70"}
+    marble2 {name:"marble2", color: "green", owner: "ghareeb", size:"70"}
+    marble3 {name:"marble3", color: "red", owner: "jason", size:"70"}
+    marble4 {name:"marble4", color: "blue", owner: "bhuppi", size:"70"}
+    marble5 {name:"marble5", color: "blue", owner: "romeet", size:"70"}
+\end{lstlisting}
+\caption{The different objects created in the experiment}
+\label{lst:obj}
+\end{Listing}
+
+Listing \ref{lst:obj} shows the different objects that will be created in separate transactions in the network. In the remaining part, we will refer to the objects with their \textbf{name} fields. In total five invoke transactions will be executed on the network at different times after modifying the blockchain file.
+
+The different steps in the experiment and their corresponding analysis can be highlighted as below:
+
+\begin{enumerate}
+    \item Joined \textbf{PEER0} and \textbf{PEER2} to the channel \textbf{mychannel}. Submitted three transactions for \textbf{marble1}, \textbf{marble2} and \textbf{marble3} respectively.
+    
+    \textbf{Outcome}: The three transactions were visible on both the peers and query on the blockchain and world state yielded correct results.
+    \item Removed the block that contained the transaction for \textbf{marble3} from the blockchain file of \textbf{PEER0}. The blockchain file is located at {\ttfamily\bfseries\slshape var/hyperledger/production/ledgersData/..}.
+    
+    \textbf{Outcome}: Execution of method \textbf{getHistoryForMarble} on \textbf{PEER0} for \textbf{marble1} and \textbf{marble2} yielded correct results. However, execution of this method for \textbf{marble3} yielded endorsement failure error. Verified it again by running the method for all the three marbles on \textbf{PEER2} which yielded right results. Thus, the \textbf{PEER0} blockchain file has been tampered can be identified.
+    \item Created another transaction for a new marble, \textbf{marble4}.
+    
+    \textbf{Outcome}: The world state for the four marbles showed correct data in the couchDB container for both the peers. However, the \textbf{getHistoryForMarble} method on \textbf{PEER0} for \textbf{marble4} gave the endorsement failure error.
+    \item Removed the block for the transaction containing \textbf{marble4} from \textbf{PEER2}.
+    
+    \textbf{Outcome}:The same behaviour of endorsement failure was observed here on \textbf{PEER2} after the execution of the method \textbf{getHistoryForMarble}.
+    \item Submitted another transaction that created a new marble, \textbf{marble5} on the network.
+    
+    \textbf{Outcome}: The transactions was successful an the couchDB container for both the peers showed five different marble objects.
+    \item Removed the block containing the transaction for \textbf{marble5} from the orderer blockchain file. The orderer blockchain file is present at {\ttfamily\bfseries\slshape var/hyperledger/production/orderer/..}. Joined peer \textbf{PEER1} to the channel.
+    
+    \textbf{Outcome} Initially when the peer \textbf{PEER1} joined the channel, it contained only three marble objects, \textbf{marble1}, \textbf{marble2} and \textbf{marble3}. However, the blockchain got synced after a considerable amount of time and showed all the five marble objects. Execution of the method \textbf{getHistoryForMarble} for all the five marbles yielded the right results.
+    \item Joined peer \textbf{PEER3} to the channel.
+    
+    \textbf{Outcome}: Initially it showed only four marble objects, \textbf{marble1}, \textbf{marble2}, \textbf{marble3} and \textbf{marble4} but eventually synced to all the five objects. Execution of the method \textbf{getHistoryForMarble} for all the five marbles yielded the right results.
+\end{enumerate}
+\subsubsection{Conclusion of Results}
+\begin{enumerate}
+    \item It can be seen that initially the newly joining peers were not consistent, but eventually they synced their blockchain files and contained the right blocks even after the orderer and the peer blockchain files were modified.
+    \item This leads us to believe that any tampering with the blockchain files can be easily caught by the system and the system tries to reach a consistent state eventually.
+    \item The ledger can, thus, be considered as tamper-resistant.
+    \item The experiment can be further extended to test for immutability by adopting different approaches.
+\end{enumerate}
+\chapter{Conclusion}
+In this chapter we will finally conclude the entire thesis. In the first part we will discuss the summary of the tasks done and the second part will focus on the future work that can be done to further study the blockchain networks.
+\label{chap:cf}
+
+\section*{Summary}
+The aim of this thesis was to study the transaction characteristics of permissioned blockchain network. For the purpose of the study, we used Hyperledger Fabric that contains a highly modular architectural pattern. We have seen the various components like \textit{chaincodes}, \textit{channels}, \textit{endorsement policies}, and the \textit{consensus protocols} in a permissioned blockchain network. The transactional properties are affected by these components and hence, importance was given to create strong modular components. 
+
+The first part of the thesis mainly focused on the research aspects related to consensus algorithms, comparing the transactional properties of permissioned blockchain networks with that of the permissionless networks and also to ACID transactions. The later part was mainly focused on how a permissioned blockchain works with all the components and the experiments that helped us to understand certain important transactional aspects. 
+
+It can be concluded that a blockchain system has an tamper-proof ledger and any modifications in the blockchain does not affect newly added peers. However, a modification to the world state and without a strong endorsement policy can lead to unwanted data being committed to the blockchain and the world state. Also writes on different channels can be achieved in business transactions by implementing an intermediate software layer that mimics a 2-PC transaction monitor where a large transaction consisting of multiple sub-transactions is made \textbf{atomic}. 
+
+\section*{Future Work}
+A blockchain network can have multiple organizations adopting different blockchain frameworks and hence, it becomes necessary to adopt a dynamic solution for blockchain networks. Further study can be done to understand the interaction of different blockchain networks like Ethereum and Hyperledger Fabric that can make the blockchain environment more interesting. Work can be done to study the transactional properties of business transactions in mixed blockchain environment.
+
+Also the immutability of the blockchain can be made more stronger by implementing compulsory strong endorsement policies and not leaving it to the disposal of the developer. A huge problem of networks like Hyperledger Fabric is the certificate authority which is currently a single node (therefore representing a single point of failure on the network) and this can be researched further.
 %\blinddocument
 
 \printbibliography
