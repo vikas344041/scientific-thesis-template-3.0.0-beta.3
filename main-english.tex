@@ -99,9 +99,9 @@ Characteristics of Permissioned Blockchain Networks},
 \else
   \section*{Abstract}
 \fi
-Blockchain is a ditributed ledger technology that consists of peers holding the same copy of data and it eliminates the need for a third party in exchanging assets and performing business transactions. In permissionless blockchain, any entity can participate in submitting and validating a transaction as the entire blockchain network is public. Example of permissionless blockchain includes Ethereum and Bitcoin network. On the other hand, permissioned blockchains only allow certain entities that have the right permission to be included in the blockchain network and to participate in the transactions proposal, execution and validation stages. Hyperledger Fabric is one such example of a permissioned blockchain involving a completely modular approach. It provides privacy and confidentiality in the blockchain network by using the concept of channels and it uses chaincode for transaction execution. \linebreak \linebreak
+Blockchain completely removes the requirement of third parties like banks in exchanging assets and performing business transactions and every participant maintains a local copy of the data. In permissionless blockchains like Ethereum or Bitcoin, any entity can participate in submitting and validating a transaction as the entire blockchain network is public. On the other hand, permissioned blockchains only allow certain entities that have the right permission to be included in the blockchain network and to participate in transaction execution and validation. Hyperledger Fabric is one such example of a permissioned blockchain system that provides privacy and confidentiality by using smaller private networks characterized by channels. Thus, Hyperledger Fabric can be used to study the business transactions. \linebreak \linebreak
 The main aim of this thesis is to investigate the transactional properties of permissioned blockchain networks like
-Hyperledger Fabric and evaluate them by comparing them to the ACID properties of \glspl{rdbms}. A supply chain application has been developed that demonstrates the various business transactions like getting product details, creating a new product and updating a product. Hyperledger Fabric performs business transactions with the help of chaincodes that are deployed on peers and channels are introduced to provide privacy. A web front-end has been created that serves as a 2-P transaction monitor for writing data to different channels. Also an android application is created that gets all the products, creates products and updates existing products in the supply chain. Rollback, save-point and nested transactions are important part of any business transactions and hence, an equivalent system that implements these concepts with blockchain is developed. Also the immutability of blockchain involving number of peers is studied and it is found that the blockchain itself is immutable but the state database on a single peer can be modified in absence of efficient endorsement policy. 
+Hyperledger Fabric and evaluate them by comparing them to the ACID properties of \glspl{rdbms}. A supply chain application has been developed that demonstrates the various business transactions like getting product details, creating a new product and updating a product. Hyperledger Fabric performs business transactions with the help of chaincodes that are deployed on peers and channels are introduced to provide privacy. A web front-end has been created that serves as a 2-PC transaction monitor for writing data to different channels within a single transaction. Business transactions are mostly characterized by many nested sub-transactions and hence, an equivalent system that fulfills this requirement with blockchain is developed. An Android application has also been developed that provides the same functions with a focus on end user.  Also the immutability of blockchain involving number of peers is studied and it is found that the blockchain itself is immutable but the state database on a single peer can be modified in absence of efficient endorsement policy. 
 
 \cleardoublepage
 
@@ -515,33 +515,34 @@ If there is a \textit{cyclic dependency} between the transactions, it cannot be 
 
 \chapter{Related Work}
 \label{chap:rel}
-In this chapter, we will discuss the two important reference work done on blockchains related to the transaction characteristics analysis. These two are important as they highlight the differences between the permissionless and permissioned blockchain networks. In Section \ref{sec:1}, the permissionless blockchains are studied for their transactional properties. In Section \ref{sec:2}, Hyperledger Fabric and its underlying architecture is discussed which is used as a reference for further study in the thesis.
+In this chapter, we will discuss the three important reference work done on blockchains related to the transaction characteristics analysis. These three are important as they highlight the differences between the permissionless and permissioned blockchain networks. In Section \ref{sec:1}, the permissionless blockchains are studied for their transactional properties. In Section \ref{sec:2}, Hyperledger Fabric and its underlying architecture is discussed which is used as a reference for further study in the thesis. Section \ref{sec:3} compares the different consensus algorithms present in different blockchain networks.
 
 \section{A Transaction Processing Perspective on Blockchains}
 \label{sec:1}
 In this keynote paper, Tai et.al. discuss the transactions characteristics of blockchains \cite{Salt}. A different model called \textbf{SALT} is proposed for the blockchain transactions.
 
 \subsection{Motivation}
-The \glspl{rdbms} transactions focus on achieving database consistency while BASE is a model that trades some consistency for availability. With the introduction of blockchains that emphasize on distributed peer-to-peer technology and immutable ledger, another model in place ACID and BASE has to be introduced as blockchain transactions are consensus driven.This model introduced by Tai et.al. is called as SALT \cite{Salt}.
+The \glspl{rdbms} transactions focus on achieving database consistency while BASE is a model that neglects some \textbf{consistency} by favoring \textbf{availability}. With the introduction of blockchains that emphasize on distributed peer-to-peer technology and immutable ledger, another model in place of ACID and BASE has to be introduced as blockchain transactions are consensus driven by the participants.This model introduced by Tai et.al. is called as \textbf{SALT} \cite{Salt}.
 
 \subsection{Study Approach}
-Blockchain transactions are consensus driven and have different properties compared to ACID and BASE models. Blocks contain transactions and it is important to study the blockchains from transaction perspective as well as block or system perspective. In this study, two real world application example of blockchain are used for comparison and evaluation of transaction properties. One use case involves Monegraph \cite{mon} which is an online digital media platform to share or sell media rights to different media users. The second use case uses Provenance blockchain \cite{pro} that is a supply chain traceability  application providing information about a product as it flows in the supply chain. 
+Blockchain transactions are consensus driven and have different properties compared to ACID and BASE models. Blocks contain transactions and it is important to study the blockchains from transaction perspective as well as blocks or system perspective. In this study, two real world application example of blockchain are used for comparison and evaluation of transaction properties. One use case involves Monegraph \cite{mon} which is an online digital media platform to share or sell media rights to different media users. The second use case uses Provenance blockchain \cite{pro} that is a supply chain traceability  application providing information about a product as it flows in the supply chain. 
 
 Both the use cases were studied from a transaction and system perspective and the results were concurrent. The blockchain transactions were characterized as \textit{Sequential}, \textit{Agreed}, \textit{Ledgered} and \textit{Tamper-Resistant} from a transactions perspective. From a system perspective, these transactions were characterized as \textit{Symmetric}, \textit{Admin-free}, \textit{Ledgered} and \textit{Time-consensual} \cite{Salt}.
 
 However, it is also important to note that the study was done on the permissionless blockchain networks and thus, it highlights the transactional properties of permissionless blockchains.
 
-\section{Hyperledger Fabric: A distributed Operating System for Permissioned Blockchains}
+\section{Hyperledger Fabric: A distributed Operating System for Permissioned Blockchains }
 \label{sec:2}
-This paper describes the modular architecture of Hyperledger Fabric and its various components like consensus algorithms, smart contraction layer, transaction flow, peer communication, ledger, etc. With the help of this study, we get a deep understanding of permissioned blockchain network like Hyperledger Fabric.
+This paper \cite{HF} describes the modular architecture of Hyperledger Fabric and its various components like consensus algorithms, smart contract layer, transaction flow, peer communication, ledger, etc. With the help of this study, we get a deep understanding of permissioned blockchain network like Hyperledger Fabric.
 
 \subsection{Motivation}
-Androulaki et. al. describe the working of Fabric and its underlying architectural style and the programming setup required to build a permissioned blockchain model. Fabric is the first blockchain system that runs distributed applications without systemic dependency on a native cryptocurrency. This is quite opposite to the permissionless blockchains that require cryptocurrency for transaction execution. Fabric uses portable membership concept combined with identity management for access control. It uses the architectural model for transaction processing called as execute-order-validate model that removes non-determinism from the smart contracts. These properties make Fabric an ideal candidate for study related to the transaction processing \cite{HF}. 
+Androulaki et. al. describe the working of Fabric and its underlying architectural style and the programming setup required to build a permissioned blockchain model. It is emphasized that Fabric is the first blockchain system that does not use cryptocurrencies and still provide the advantages of distributed applications. This is quite opposite to the permissionless blockchains that require cryptocurrency for transaction execution. Fabric uses portable membership concept combined with identity management for access control. It uses the architectural model for transaction processing called as execute-order-validate model that removes non-determinism from the smart contracts. These properties make Fabric an ideal candidate for study related to the transaction processing \cite{HF}. 
 
 \subsection{Study approach}
 The study in this paper highlights the difference between the order-execute architecture model used in permissionless blockchains and early permissioned blockchains and the execute-order-validate architecture model of Hyperledger Fabric. For the purpose of study, a authority minted cryptocurrency similar to that of Bitcoin is used which is defined as \textit{Fabcoin} in the paper \cite{HF}. The study is focussed on the customization of the validation phase and the endorsement policy. The developed model is used for benchmarking of permissioned blockchains.
 
 \section{Blockchain Consensus Protocols in the Wild}
+\label{sec:3}
 Cachin and Vukoli\'c \cite{Con} wrote a paper on the different consensus models for blockchain that include crash tolerant and byzantine tolerant models.
 
 \subsection{Motivation}
@@ -553,16 +554,12 @@ Cachin and Vukoli\'c review the different consensus protocols in some prominent 
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=10cm,height=10cm,keepaspectratio]{conTable.png}
-\caption{Summary of consensus resilience properties, some of which use statically configured nodes
-with a special role. Symbols and notes: ‘X’ means that the protocol is resilient against the fault and ‘−’
-that it is not; ‘.’ states that no such special node exists in the protocol; ‘?’ denotes that the properties
-cannot be assessed due to lack of information; (X) denotes the crash of other nodes, different from the
-special node; + MultiChain has non-final decisions; ⊕ PoET assumes trusted hardware available from
-only one vendor; ⊗ Ripple tolerates one of the five default Ripple-operated validators (special nodes) to
-be subverted \cite{Con}}.
+\caption{The consensus resilience properties in different blockchain networks \cite{Con}}.
 \label{fig:conT}
 \end{center}
 \end{figure}
+
+Figure \ref{fig:conT} shows the comparison of dofferent blockchains based on their consensus resilience properties. The symbol \textbf{'X'} denotes that the system has a resilient model against faults whereas \textbf{'-'} denotes it is not. With the symbol \textbf{'.'}, no special node is present in the protocol whereas \textbf{'?'} denotes that the properties can't be accessed \cite{Con}.
 
 \chapter{Blockchain Transaction Characteristics}
 In this chapter, we will see the various transaction characteristics of permissioned blockchain network by studying the Hyperledger Fabric framework. We will compare the transaction properties of Hyperledger Fabric with that of the permissionless blockchain networks and the \glspl{rdbms} for a proper understanding. The effect of various components like \textit{channels}, \textit{chaincodes}, \textit{endorsement policies} and \textit{consensus algorithms} on the transaction properties will be studied here.
@@ -1581,7 +1578,7 @@ The above experiment to read the chaincode state from different chaincode can be
     \textbf{sum} & - & 0 & 300 & 300 & 300 \\ \hline
     \end{tabular}
 \end{center}
-\caption{Different values for the keys during different chaincode operations.}
+\caption{Different values for the keys during different chaincode operations for read from same channel.}
     \label{tab:result1}
 \end{table}
 \subsubsection{Conclusion of Results}
@@ -1668,7 +1665,7 @@ The above experiment to write to the chaincode state from a  different chaincode
     \textbf{b} & - & 200 & 200 & 210 & 237 \\ \hline
     \end{tabular}
 \end{center}
-\caption{Different values for the keys during different chaincode operations.}
+\caption{Different values for the keys during different chaincode operations during write on same channel.}
 \label{tab:result2}
 \end{table}
 \subsubsection{Conclusion of Results}
@@ -1766,7 +1763,7 @@ The overall flow of the experiment can be seen in the Figure \ref{fig:readsc2}. 
     \textbf{sum} & - & 0 & 300 & 300 & 300 \\ \hline
     \end{tabular}
 \end{center}
-\caption{Different values for the keys during different chaincode operations.}
+\caption{Different values for the keys during different chaincode operations during read from different channels.}
     \label{tab:result12}
 \end{table}
 The above experiment to read the chaincode state from different chaincodes on different channels can be summarized in the Table \ref{tab:result12}. The table shows the different values of the chaincode keys after different operations were performed. The key \textbf{sum} that belongs to \textbf{chaincode2} on channel \textbf{mychannel2} contains the sum of the values read for key \textbf{a} and the key \textbf{b} from \textbf{chaincode1} that belongs on channel \textbf{mychannel1}. The experiment was also performed for different values of \textbf{a} and \textbf{b} and it concurred with the previous result.
@@ -1820,7 +1817,7 @@ The above experiment to write to the chaincode state from a  different chaincode
     \textbf{b} & - & 200 & 200 & 210 & 210 \\ \hline
     \end{tabular}
 \end{center}
-\caption{Different values for the keys during different chaincode operations.}
+\caption{Different values for the keys during different chaincode operations during write on different channels.}
 \label{tab:result22}
 \end{table}
 \subsubsection{Conclusion of Results}
